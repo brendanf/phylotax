@@ -1,0 +1,47 @@
+Package: phylotax
+Type: Package
+Title: Refine taxonomic assignment of environmental sequences using a taxonomic tree
+Version: 0.0.1
+Authors@R: person(given = "Brendan", family = "Furneaux",
+                  email = "brendan.furneaux@gmail.com",
+                  role = c("aut", "cre"))
+Description: Combines taxonomic assignments made with different methods or
+    databases using a phylogenetic tree.  Clades within the tree are assigned
+    to a taxon if the assignment is consistent with at least one result for all
+    of the members of the clade, except the members that do not have any
+    assignments at all.  This resolves conflict between different methods, while
+    also adding assignments to unknown sequences which are nested in an
+    identified clade.
+    The package also includes helper functions to assign taxonomy using several
+    methods, and compile the results into a uniform format.
+License: GPL-3
+URL: https://www.github.com/brendanf/phylotax
+BugReports: https://www.github.com/brendanf/phylotax/issues
+Encoding: UTF-8
+LazyData: true
+Requires: R (>= 3.0.0)
+Imports:
+   ape,
+   assertthat,
+   Biostrings,
+   dada2,
+   DECIPHER,
+   dplyr,
+   futile.logger,
+   magrittr,
+   Matrix,
+   methods,
+   phangorn,
+   plyr,
+   purrr,
+   readr,
+   rlang,
+   seqinr,
+   stringr,
+   taxa,
+   tibble,
+   tidyr,
+   tzara
+Suggests:
+   ShortRead
+RoxygenNote: 7.0.2
