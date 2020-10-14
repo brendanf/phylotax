@@ -7,14 +7,7 @@
 \alias{taxonomy_idtaxa}
 \title{Assign taxonomy to nucleotide sequences}
 \usage{
-taxonomy(
-  seq.table,
-  reference,
-  method,
-  min_confidence = 50,
-  multithread = FALSE,
-  ...
-)
+taxonomy(seq, reference, method, min_confidence = 50, multithread = FALSE, ...)
 
 taxonomy_dada2(
   seq,
@@ -46,7 +39,7 @@ taxonomy_idtaxa(
 )
 }
 \arguments{
-\item{seq.table}{(`character`` vector or something that can be coerced to
+\item{seq}{(`character`` vector or something that can be coerced to
 one, or a matrix with sequences as the column names ) Sequences to
 assign taxonomy}
 
@@ -101,3 +94,4 @@ Any of these can be passed to \link{taxtable} to get a uniform format suitable
 for use in \link{phylotax}.
 }
 }
+

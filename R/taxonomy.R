@@ -19,7 +19,7 @@ rank_factor <- function(r,
 #' 
 #' 
 #'
-#' @param seq.table (`character`` vector or something that can be coerced to
+#' @param seq (`character`` vector or something that can be coerced to
 #' one, or a matrix with sequences as the column names ) Sequences to
 #' assign taxonomy
 #' @param reference (`character`` string giving a path to a file or the
@@ -47,16 +47,17 @@ rank_factor <- function(r,
 #' Any of these can be passed to [taxtable] to get a uniform format suitable
 #' for use in [phylotax].
 #' @export
-taxonomy <- function(seq.table, reference, method, min_confidence = 50, multithread = FALSE, ...) {
+taxonomy <- function(seq, reference, method, min_confidence = 50, multithread = FALSE, ...) {
   # we can take a community matrix (in which case the sequences are the column
   # names) or the sequences
-  if (is.matrix(seq.table)) {
-    nreads <- Matrix::colSums(seq.table)
-    seq <- colnames(seq.table)
+  if (is.matrix(seq)) {
+    nreads <- Matrix::colSums(seq)
+    seq <- colnames(seq)
   } else {
     nreads <- 1
-    seq <- as.character(seq.table)
-    names(seq) <- names(seq.table)
+    seqnames <- names(seq)
+    seq <- as.character(seq)
+    names(seq) <- seqnames
   }
   is.RNA <- stringr::str_detect(seq[1], "[Uu]")
   # seq <- if (is.RNA) Biostrings::RNAStringSet(seq) else Biostrings::DNAStringSet(seq)
