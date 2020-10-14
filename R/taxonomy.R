@@ -12,31 +12,40 @@ rank_factor <- function(r,
 
 #' Assign taxonomy to nucleotide sequences
 #'
-#' This method dispatches to other R packages or external programs.
+#' This method uses a common interface to call primary taxonomic assignment
+#' algorithms (i.e., those which assign taxonomy based on a taxonomically
+#' classified reference sequence database, but not based on the results of other
+#' algorithms) from other R packages or external programs.
+#' 
+#' 
 #'
-#' @param seq.table (\code{character} vector or something that can be coerced to
-#'        one, or a matrix with sequences as the column names) Sequences to
-#'        assign taxonomy
-#' @param reference (\code{character} string giving a path to a file or the
-#'        result from \code{\link[DECIPHER]{LearnTaxa}}) An appropriately
-#'        formatted reference database
-#' @param method (\code{character} string) taxonomy assignment method.
-#'        Currently accepted values are "dada2", "sintax", and "idtaxa".
-#' @param min_confidence (\code{integer} between 0 and 100) The minimum
-#'        confidence to report results.
-#' @param multithread (\code{integer} scalar) the number of processors to use
-#'        for assignment.
+#' @param seq.table (`character`` vector or something that can be coerced to
+#' one, or a matrix with sequences as the column names ) Sequences to
+#' assign taxonomy
+#' @param reference (`character`` string giving a path to a file or the
+#' result from [DECIPHER::LearnTaxa()]/[train_idtaxa()]) An appropriately
+#' formatted reference database (see Details).
+#' @param method (`character`` string) taxonomy assignment method.
+#' Currently accepted values are "dada2", "sintax", and "idtaxa".
+#' @param min_confidence (`integer`` between 0 and 100) The minimum
+#' confidence to report results.
+#' @param multithread (`integer` scalar) the number of processors to use
+#' for assignment.
 #' @param ... additional arguments for methods
 #'
 #' @return raw results of the taxonomy assignment, of various types depending on
-#'        \code{method}.  (\code{method = "dada2"}) returns a \code{list} with
-#'        elements "tax" and "boot", as \code{\link[dada2]{assignTaxonomy}}.
-#'        (\code{method = "sintax"}) returns a \code{data.frame} with columns
-#'        "label", "hit", "strand", and, if \code{min_confidence} is not given,
-#'        "c12n" (short for "classification"). (\code{method = "idtaxa"}) gives
+#' `method`.
+#'
+#' @details # Return types
+#'    * `taxonomy_dada2` and `taxonomy(..., method = "dada2")` return a `list`
+#'      with elements "tax" and "boot", as [dada2::assignTaxonomy].
+#'    * `taxonomy_sintax` and `taxonomy(..., method = "sintax")` return a
+#'      `data.frame` with columns "label", "hit", "strand", and, if
+#'      `min_confidence` is not given, "c12n" (short for "classification").
+#'    * `taxonomy_idtaxa` and `taxonomy(..., method = "idtaxa")` gives
 #'        an S4 object of classes "Taxa" and "Train".
-#'        Any of these can be passed to \code{\link{taxtable}} to get a
-#'        uniform format.
+#' Any of these can be passed to [taxtable] to get a uniform format suitable
+#' for use in [phylotax].
 #' @export
 taxonomy <- function(seq.table, reference, method, min_confidence = 50, multithread = FALSE, ...) {
   # we can take a community matrix (in which case the sequences are the column
@@ -62,9 +71,9 @@ taxonomy <- function(seq.table, reference, method, min_confidence = 50, multithr
 }
 
 
-#' @param tryRC (\code{logical} scalar) passed on to \code{\link[dada2]{assignTaxonomy}}
-#' @param outputBootstraps (\code{logical} scalar) passed on to \code{\link[dada2]{assignTaxonomy}}
-#' @param verbose (\code{logical} scalar) passed on to \code{\link[dada2]{assignTaxonomy}}
+#' @param tryRC (`logical` scalar) passed on to `dada2::assignTaxonomy()`
+#' @param outputBootstraps (`logical` scalar) passed on to `dada2::assignTaxonomy()`
+#' @param verbose (`logical` scalar) passed on to `dada2::assignTaxonomy()`
 #' @rdname taxonomy
 #' @export
 taxonomy_dada2 <- function(seq, reference, multithread = FALSE, min_confidence,
@@ -81,10 +90,10 @@ taxonomy_dada2 <- function(seq, reference, multithread = FALSE, min_confidence,
                         ...)
 }
 
-#' @param exec (\code{character} string) name of the executable to use for
-#'       SINTAX search.  The default is "vsearch", but "usearch" should also
-#'       work.  In either case, the executable should be installed and on the
-#'       system path.
+#' @param exec (`character` string) name of the executable to use for
+#' SINTAX search.  The default is "vsearch", but "usearch" should also
+#' work.  In either case, the executable should be installed and on the
+#' system path.
 #' @rdname taxonomy
 #' @export
 taxonomy_sintax <- function(seq, reference, min_confidence = NULL, multithread = FALSE, exec = "vsearch", ...) {
@@ -171,7 +180,7 @@ taxonomy_sintax <- function(seq, reference, min_confidence = NULL, multithread =
   }
 }
 
-#' @param strand (\code{character} string) passed on to \code{\link[DECIPHER]{IdTaxa}}
+#' @param strand (`character` string) passed on to `DECIPHER::IdTaxa()`
 #' @rdname taxonomy
 #' @export
 taxonomy_idtaxa <- function(seq, reference, multithread = FALSE, strand = "top", min_confidence = 40, ...) {
@@ -224,17 +233,17 @@ sintax_format <- function(tax) {
 #' Convert results from different taxonomic assignment algorithms to a uniform
 #' format
 #'
-#' @param tax Results from \code{\link{taxonomy}}
-#' @param min_confidence (\code{integer}) The minimum confidence to include in
-#'   results. May be higher than the value given in \code{\link{taxonomy}},
-#'   but will have no effect if it is lower.
+#' @param tax Results from `taxonomy()`
+#' @param min_confidence (`integer`) The minimum confidence to include in
+#' results. May be higher than the value given in `taxonomy()`,
+#' but will have no effect if it is lower.
 #' @param ... passed to methods
 #'
-#' @return a \code{\link[tibble]{tibble}} with columns: \describe{
-#'   \item{\code{label}}{sequence identifier}
-#'   \item{\code{rank}}{the rank of the assignment}
-#'   \item{\code{taxon}}{the taxon which was assigned}
-#'   \item{\code{confidence}}{the confidence of the assignment}
+#' @return a `tibble::tibble()` with columns: \describe{
+#' \item{`label`}{sequence identifier}
+#' \item{`rank`}{the rank of the assignment}
+#' \item{`taxon`}{the taxon which was assigned}
+#' \item{`confidence`}{the confidence of the assignment}
 #' } Each query sequence will typically occupy several rows of the output, one
 #' for each rank which was assigned.
 #' @export
@@ -297,14 +306,14 @@ taxtable_dada2 <- function(tax, names = rownames(tax$tax),
 #' be used to classify sequences.  This step can be time consuming, so it is
 #' performed separately from the actual classification, and the result can be
 #' saved for future analyses. This is a convenience function that makes it easy
-#' to fit a model using \code{\link[DECIPHER]{LearnTaxa}} on the same reference
-#' file that would be used for \code{\link{taxonomy_sintax}}.
+#' to fit a model using `DECIPHER::LearnTaxa()` on the same reference
+#' file that would be used for `taxonomy_sintax()`.
 #'
-#' @param fasta (\code{character} string) path to a fasta file containing the
-#'   reference sequences, with headers formatted as required for SINTAX.
+#' @param fasta (`character` string) path to a fasta file containing the
+#' reference sequences, with headers formatted as required for SINTAX.
 #'
-#' @return an object of classes \code{Taxa} and \code{Train}, as required for
-#'   \code{\link{taxonomy_idtaxa}} or \code{\link[DECIPHER]{IdTaxa}}
+#' @return an object of classes `Taxa` and `Train`, as required for
+#' `taxonomy_idtaxa()` or `DECIPHER::IdTaxa()`
 #' @export
 train_idtaxa <- function(fasta) {
   seqdata <- Biostrings::readDNAStringSet(fasta)
@@ -484,24 +493,24 @@ phylotax_ <- function(tree, taxa, node, ranks, e) {
 
 #' Assign taxon labels to nodes in a tree when there is a consensus of IDs on descendent tips.
 #'
-#' @param tree (\code{\link[ape]{phylo}} object) A tree including the taxa to be
-#'   classified.  The tip labels should match the "label" column in \code{taxa}.
-#' @param taxa (\code{data.frame}) Taxon assignments for the taxa on the tree,
-#'   as returned by \code{\link{taxtable}}.  Should have columns "label",
-#'   "rank", and "taxon", but may have other columns as well.  Multiple
-#'   assignments for each lable are allowed, and
-#'   can be generated by using \code{\link{rbind}} or \code{\link[dplyr]{bind_rows}}
-#'   on results from multiple calls to \code{\link{taxonomy}} and
-#'   \code{\link{taxtable}}.
+#' @param tree (`ape::phylo()` object) A tree including the taxa to be
+#' classified.  The tip labels should match the "label" column in `taxa`.
+#' @param taxa (`data.frame`) Taxon assignments for the taxa on the tree,
+#' as returned by `taxtable()`.  Should have columns "label",
+#' "rank", and "taxon", but may have other columns as well.  Multiple
+#' assignments for each label are allowed, and
+#' can be generated by using `rbind()` or `dplyr::bind_rows()`
+#' on results from multiple calls to `taxonomy()` and
+#' `taxtable()`.
 #'
 #' @return a list with two elements, "tip_taxa" and "node_taxa".  "tip_taxa" is
-#'     a \code{\link[tibble]{tibble}} with the same format as \code{taxa}, in
-#'     which assignments which are inconsistent with the phylogeny have been
-#'     removed, and new assignments deduced or confirmed from the phylogeny.
-#'     These are identified by the value "phylotax" in the "method" column,
-#'     which is created if it does not already exist.  "node_taxa" has columns
-#'     "node", "rank" and "taxon", giving taxonomic assignments for the nodes of
-#'     the tree.
+#' a `tibble::tibble()` with the same format as `taxa`, in
+#' which assignments which are inconsistent with the phylogeny have been
+#' removed, and new assignments deduced or confirmed from the phylogeny.
+#' These are identified by the value "phylotax" in the "method" column,
+#' which is created if it does not already exist.  "node_taxa" has columns
+#' "node", "rank" and "taxon", giving taxonomic assignments for the nodes of
+#' the tree.
 #'
 #' @export
 phylotax <- function(tree = ape::read.tree(text = paste0("(", paste(unique(taxa$label), collapse = ","), ");")), taxa) {
