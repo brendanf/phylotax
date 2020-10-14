@@ -593,7 +593,7 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
         taxon
       )
       for (n in names(method)) {
-        newAssign[[n]] <- method[n]
+        newAssign[[n]] <- unname(method[n])
       }
       # remove assignments which are not consistent with the one we just chose
       e$tip_taxa <- dplyr::bind_rows(
