@@ -43,6 +43,7 @@ Imports:
    tidyr,
    tzara
 Suggests:
-   ShortRead
+    ShortRead,
+    covr
 RoxygenNote: 7.0.2
 Roxygen: list(markdown = TRUE)
