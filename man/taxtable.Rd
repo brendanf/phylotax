@@ -2,10 +2,19 @@
 % Please edit documentation in R/taxonomy.R
 \name{taxtable}
 \alias{taxtable}
+\alias{taxtable_sintax}
+\alias{taxtable_idtaxa}
+\alias{taxtable_dada2}
 \title{Convert results from different taxonomic assignment algorithms to a uniform
 format}
 \usage{
 taxtable(tax, ...)
+
+taxtable_sintax(tax, min_confidence = 0, ...)
+
+taxtable_idtaxa(tax, min_confidence = 0, names = NULL, ...)
+
+taxtable_dada2(tax, names = rownames(tax$tax), min_confidence = 0, ...)
 }
 \arguments{
 \item{tax}{Results from \code{taxonomy()}}
@@ -15,6 +24,10 @@ taxtable(tax, ...)
 \item{min_confidence}{(\code{integer}) The minimum confidence to include in
 results. May be higher than the value given in \code{taxonomy()},
 but will have no effect if it is lower.}
+
+\item{names}{(\code{character} vector) names for the sequences; these will be the
+values that end up in the "\code{label}" column. If not given explicitly, they are
+taken from the taxonomy results if this is possible.}
 }
 \value{
 a \code{tibble::tibble()} with columns: \describe{

@@ -1,5 +1,6 @@
 # phylotax 0.0.2
 
+* Algorithm-specific implementations for `taxonomy()` are now exported.
 * **BREAKING CHANGE** The first argument of `taxonomy()` is now called "seq"
   instead of "seq.table".
 * Add `example_tree()` and `example_taxa()` for use in examples and tests.

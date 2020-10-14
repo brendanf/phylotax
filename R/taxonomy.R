@@ -246,9 +246,6 @@ sintax_format <- function(tax) {
 #' format
 #'
 #' @param tax Results from `taxonomy()`
-#' @param min_confidence (`integer`) The minimum confidence to include in
-#' results. May be higher than the value given in `taxonomy()`,
-#' but will have no effect if it is lower.
 #' @param ... passed to methods
 #'
 #' @return a `tibble::tibble()` with columns: \describe{
@@ -271,6 +268,12 @@ taxtable <- function(tax, ...) {
   }
 }
 
+
+#' @param min_confidence (`integer`) The minimum confidence to include in
+#' results. May be higher than the value given in `taxonomy()`,
+#' but will have no effect if it is lower.
+#' @rdname taxtable
+#' @export
 taxtable_sintax <- function(tax, min_confidence = 0, ...) {
   tidyr::separate_rows("tax", "hit", sep = ",") %>%
     dplyr::mutate_at("hit", dplyr::na_if, "") %>%
@@ -285,6 +288,11 @@ taxtable_sintax <- function(tax, min_confidence = 0, ...) {
     dplyr::filter(.data$confidence >= min_confidence, !is.na(.data$taxon))
 }
 
+#' @param names (`character` vector) names for the sequences; these will be the
+#' values that end up in the "`label`" column. If not given explicitly, they are
+#' taken from the taxonomy results if this is possible.
+#' @rdname taxtable
+#' @export
 taxtable_idtaxa <- function(tax, min_confidence = 0, names = NULL, ...) {
   if (!missing(names) && !is.null(names)) names(tax) <- names
   purrr::imap_dfr(tax, ~tibble::tibble(label = .y,
@@ -296,12 +304,16 @@ taxtable_idtaxa <- function(tax, min_confidence = 0, names = NULL, ...) {
                   .data$confidence >= min_confidence)
 }
 
+
+#' @rdname taxtable
+#' @export
 taxtable_dada2 <- function(tax, names = rownames(tax$tax),
                            min_confidence = 0, ...) {
   taxa <- tax$tax %>% magrittr::set_rownames(names) %>%
     tibble::as_tibble(rownames = "label") %>%
     tidyr::gather(key = "rank", value = "taxon", -1)
-  conf <- (tax$boot / 100) %>% magrittr::set_rownames(names) %>%
+  conf <- (tax$boot / 100) %>%
+    magrittr::set_rownames(names) %>%
     tibble::as_tibble(rownames = "label") %>%
     tidyr::gather(key = "rank", value = "confidence", -1)
   dplyr::full_join(taxa, conf, by = c("label", "rank")) %>%
