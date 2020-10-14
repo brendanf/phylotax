@@ -565,7 +565,15 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
       }
       break
     } else {
-      futile.logger::flog.info("Assigned node %d to %s %s.", node, as.character(r), taxon)
+      children <- phangorn::Children(tree, node)
+      if (length(children) > 0) {
+        futile.logger::flog.info(
+          "Assigned node %d and its %d children to %s %s.",
+          node, length(children), as.character(r), taxon)
+      } else {
+        futile.logger::flog.info("Assigned node %d to %s %s.", node,
+                                 as.character(r), taxon)
+      }
       ranks <- ranks[-1]
       e$node_taxa <- dplyr::bind_rows(
         e$node_taxa,
