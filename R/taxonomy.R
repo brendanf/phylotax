@@ -117,7 +117,7 @@ taxonomy_sintax <- function(seq, reference, min_confidence = NULL, multithread =
       seq <- tibble::tibble(label = as.character(seq@id, use.names = FALSE),
                             seq = as.character(seq@sread, use.names = FALSE))
     } else if (is.character(seq)) {
-      if (is.null(names(seq))) names(seq) <- tzara::seqhash(seq)
+      if (is.null(names(seq))) names(seq) <- seqhash(seq)
       is.RNA <- any(stringr::str_detect(seq, "[Uu]"))
       if (is.RNA) {
         seq <- Biostrings::RNAStringSet(chartr("Tt", "Uu", seq))
@@ -518,4 +518,14 @@ phylotax <- function(tree = ape::read.tree(text = paste0("(", paste(unique(taxa$
   ranks <- sort(unique(taxa$rank))
   phylotax_(tree, taxa, phangorn::getRoot(tree), ranks, e)
   as.list(e)
+}
+
+example_tree <- function() {
+  ape::read.tree(text = "(A:1,((B:1,C:1):1,((E:1,F:1):1,D:1):1):1);")
+}
+
+example_taxa <- function() {
+  tibble::tibble(
+    
+  )
 }
