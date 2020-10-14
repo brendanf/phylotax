@@ -2,5 +2,9 @@
 
 language: R
 cache: packages
+bioc_packages:
+   - DECIPHER
+   - Biostrings
+   - ShortRead
 after_success:
   - Rscript -e 'covr::codecov()'
