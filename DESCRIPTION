@@ -26,6 +26,7 @@ Imports:
    Biostrings,
    dada2,
    DECIPHER,
+   digest,
    dplyr,
    futile.logger,
    magrittr,
