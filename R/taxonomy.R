@@ -520,12 +520,31 @@ phylotax <- function(tree = ape::read.tree(text = paste0("(", paste(unique(taxa$
   as.list(e)
 }
 
+#' Simple phylogenetic tree for use in examples
+#'
+#' @return a [`phylo`][ape::read.tree()] object giving a very simple tree;
+#' tip labels are the same as those in [example_taxa()].
+#' @export
+#'
+#' @examples example_tree()
 example_tree <- function() {
   ape::read.tree(text = "(A:1,((B:1,C:1):1,((E:1,F:1):1,D:1):1):1);")
 }
 
+#' Example taxonomy assignments
+#'
+#' @return a [tibble::tibble()] in the format used by [taxtable()] giving a
+#' simple set of taxonomy assignments suitable for use in [phylotax()].
+#' Tip labels are the same as those used in [example_tree()].
+#' @export
+#'
+#' @examples example_taxa()
 example_taxa <- function() {
   tibble::tibble(
-    
+    rank = "clade",
+    taxon = c(NA, "Tax1", "Tax2", "Tax2", NA, NA,
+              NA, "Tax2", "Tax2", "Tax1", NA, "Tax1"),
+    method = rep(c("XTAX", "YTAX"), each = 6),
+    label = rep(LETTERS[1:6], 2)
   )
 }
