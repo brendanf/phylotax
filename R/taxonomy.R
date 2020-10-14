@@ -67,7 +67,7 @@ taxonomy <- function(seq.table, reference, method, min_confidence = 50, multithr
 #' @param verbose (\code{logical} scalar) passed on to \code{\link[dada2]{assignTaxonomy}}
 #' @rdname taxonomy
 #' @export
-taxonomy_dada2 <- function(seq, reference, multithread = FALSE,
+taxonomy_dada2 <- function(seq, reference, multithread = FALSE, min_confidence,
                            tryRC = FALSE,
                            outputBootstraps = TRUE,
                            verbose = TRUE, ...) {
