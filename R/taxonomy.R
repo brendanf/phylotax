@@ -683,7 +683,9 @@ phylotax <- function(
 #'
 #' @examples example_tree()
 example_tree <- function() {
-  ape::read.tree(text = "(A:1,((B:1,C:1):1,((E:1,F:1):1,D:1):1):1);")
+  tree <- ape::read.tree(text = "(A:1,((B:1,C:1):1,((E:1,F:1):1,D:1):1):1);")
+  tree$node.label <- 1:tree$Nnode
+  tree
 }
 
 #' Example taxonomy assignments
