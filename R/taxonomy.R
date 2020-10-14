@@ -306,7 +306,7 @@ taxtable_dada2 <- function(tax, names = rownames(tax$tax),
 #' @return an object of classes \code{Taxa} and \code{Train}, as required for
 #'   \code{\link{taxonomy_idtaxa}} or \code{\link[DECIPHER]{IdTaxa}}
 #' @export
-fit_idtaxa <- function(fasta) {
+train_idtaxa <- function(fasta) {
   seqdata <- Biostrings::readDNAStringSet(fasta)
   taxonomy <- names(seqdata)
 
