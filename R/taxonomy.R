@@ -696,10 +696,11 @@ example_tree <- function() {
 #' @examples example_taxa()
 example_taxa <- function() {
   tibble::tibble(
-    rank = "clade",
-    taxon = c(NA, "Tax1", "Tax2", "Tax2", NA, NA,
-              NA, "Tax2", "Tax2", "Tax1", NA, "Tax1"),
+    label = rep(LETTERS[1:6], 2),
     method = rep(c("XTAX", "YTAX"), each = 6),
-    label = rep(LETTERS[1:6], 2)
-  )
+    rank = "genus",
+    taxon = c(NA, "Tax1", "Tax2", "Tax2", NA, NA,
+              NA, "Tax2", "Tax2", "Tax1", NA, "Tax1")
+  ) %>%
+    dplyr::filter(stats::complete.cases(.))
 }
