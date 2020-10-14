@@ -300,7 +300,7 @@ taxtable_dada2 <- function(tax, names = rownames(tax$tax),
     dplyr::mutate_at("rank", rank_factor)
 }
 
-#' Train an IDTAXA model to a fasta file with [UV]SEARCH/SINTAX-style taxonomy
+#' Train an IDTAXA model to a fasta file with \\[UV\\]SEARCH/SINTAX-style taxonomy
 #'
 #' IDTAXA needs to train a model on a taxonomic reference database before it can
 #' be used to classify sequences.  This step can be time consuming, so it is

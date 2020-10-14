@@ -2,7 +2,7 @@
 % Please edit documentation in R/taxonomy.R
 \name{train_idtaxa}
 \alias{train_idtaxa}
-\title{Train an IDTAXA model to a fasta file with \link{UV}SEARCH/SINTAX-style taxonomy}
+\title{Train an IDTAXA model to a fasta file with \[UV\]SEARCH/SINTAX-style taxonomy}
 \usage{
 train_idtaxa(fasta)
 }
