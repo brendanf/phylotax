@@ -1,5 +1,9 @@
 # phylotax 0.0.2
 
+* `phylotax()` gains a "`method`" argument, used to specify which of the
+  columns in the input taxonomic assignment table are used to distinguish
+  different primary methods, and what values should be used for assignments
+  made by PHYLOTAX.
 * `phylotax()` gains a "`ranks`" argument, in case the incoming data does not
   use the default rank names. This can be omitted if the `rank` column is
   already an ordered factor.
