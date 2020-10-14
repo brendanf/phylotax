@@ -5,8 +5,7 @@
 \title{Assign taxon labels to nodes in a tree when there is a consensus of IDs on descendent tips.}
 \usage{
 phylotax(
-  tree = ape::read.tree(text = paste0("(", paste(unique(taxa$label), collapse = ","),
-    ");")),
+  tree = NULL,
   taxa,
   ranks = NULL,
   method = if (utils::hasName(taxa, "method")) "PHYLOTAX" else NULL
@@ -14,7 +13,9 @@ phylotax(
 }
 \arguments{
 \item{tree}{(\code{ape::phylo()} object) A tree including the taxa to be
-classified.  The tip labels should match the "label" column in \code{taxa}.}
+classified.  The tip labels should match the "label" column in \code{taxa}. If no
+tree is given, a star tree will be used, which results in each tip being
+assigned to the strict consensus of its primary assignments, if any.}
 
 \item{taxa}{(\code{data.frame}) Taxon assignments for the taxa on the tree,
 as returned by \code{taxtable()}.  Should have columns "label",
