@@ -103,7 +103,7 @@ taxonomy_sintax <- function(seq, reference, min_confidence = NULL, multithread =
     seq <- seqinr::read.fasta(
       file = seqfile,
       as.string = TRUE) %>%
-      {tibble(seq = unlist(seqinr::getSequence(., as.string = TRUE)),
+      {tibble::tibble(seq = unlist(seqinr::getSequence(., as.string = TRUE)),
               label = seqinr::getName(.))}
   } else {
     seqfile <- tempfile("seq", fileext = ".fasta")
@@ -198,15 +198,23 @@ taxonomy_idtaxa <- function(seq, reference, multithread = FALSE, strand = "top",
 }
 
 sintax_format <- function(tax) {
-  tax <- dplyr::mutate_at(tax, "c12n", sub, pattern = "(,?[dkpcofgs]:unidentified)+$", replacement = "") %>%
-    dplyr::mutate(name = sub(c12n, pattern = ".*,?[dkpcofgs]:", replacement = "")) %>%
-    tidyr::separate_rows(c12n, sep = ",") %>%
+  tax <- dplyr::mutate_at(
+    tax,
+    "c12n",
+    sub,
+    pattern = "(,?[dkpcofgs]:unidentified)+$",
+    replacement = ""
+  ) %>%
+    dplyr::mutate(
+      name = sub(.data$c12n, pattern = ".*,?[dkpcofgs]:", replacement = "")
+    ) %>%
+    tidyr::separate_rows("c12n", sep = ",") %>%
     dplyr::mutate_at("c12n", dplyr::na_if, "") %>%
-    tidyr::separate(c12n, into = c("rank", "taxon"), sep = ":") %>%
+    tidyr::separate("c12n", into = c("rank", "taxon"), sep = ":") %>%
     dplyr::mutate_at("taxon", dplyr::na_if, "unidentified") %>%
     dplyr::mutate_at("rank", rank_factor, abbrev = TRUE) %>%
     tidyr::spread(key = "rank", value = "taxon") %>%
-    dplyr::select(-`<NA>`) %>%
+    dplyr::select(-"<NA>") %>%
     dplyr::mutate_at("name", rlang::`%|%`, "unknown") %>%
     tidyr::unite(col = "Taxonomy",
                  dplyr::one_of("domain", "kingdom", "phylum", "class", "order",
@@ -216,13 +224,16 @@ sintax_format <- function(tax) {
     dplyr::mutate_at("Taxonomy", sub, pattern = "(;?NA)+", replacement = "") %>%
     dplyr::mutate_at("Taxonomy", sub, pattern = "[|].*", replacement = "") %>%
     dplyr::mutate_at("Taxonomy", sub, pattern = "_sp^", replacement = "") %>%
-    dplyr::mutate_at("Taxonomy", sub, pattern = "([^;]+);\\1", replacement = "\\1")
+    dplyr::mutate_at("Taxonomy", sub, pattern = "([^;]+);\\1",
+                     replacement = "\\1")
 
   if ("species" %in% names(tax)) {
-    tax <- dplyr::mutate(tax, name = paste0(name, ifelse(is.na(species),
-                                                         "_sp", "")))
+    tax <- dplyr::mutate(
+      tax,
+      name = paste0(.data$name, ifelse(is.na(.data$species), "_sp", ""))
+    )
   } else {
-    tax <- dplyr::mutate(tax, name = paste0(name, "_sp"))
+    tax <- dplyr::mutate(tax, name = paste0(.data$name, "_sp"))
   }
   tax
 }
@@ -260,17 +271,17 @@ taxtable <- function(tax, ...) {
 }
 
 taxtable_sintax <- function(tax, min_confidence = 0, ...) {
-  tidyr::separate_rows(tax, hit, sep = ",") %>%
+  tidyr::separate_rows("tax", "hit", sep = ",") %>%
     dplyr::mutate_at("hit", dplyr::na_if, "") %>%
-    tidyr::extract(hit, into = c("rank", "taxon", "confidence"),
+    tidyr::extract("hit", into = c("rank", "taxon", "confidence"),
                    regex = "([dkpcofgs]):([^(]+)\\(([01]\\.\\d+)\\)") %>%
     dplyr::mutate_at("taxon", dplyr::na_if, "unidentified") %>%
     dplyr::mutate_at("taxon", gsub, pattern = "Incertae",
                      replacement = "incertae") %>%
     dplyr::mutate_at("confidence", as.numeric) %>%
     dplyr::mutate_at("rank", rank_factor, abbrev = TRUE) %>%
-    dplyr::select(label, rank, taxon, confidence) %>%
-    dplyr::filter(confidence >= min_confidence, !is.na(taxon))
+    dplyr::select("label", "rank", "taxon", "confidence") %>%
+    dplyr::filter(.data$confidence >= min_confidence, !is.na(.data$taxon))
 }
 
 taxtable_idtaxa <- function(tax, min_confidence = 0, names = NULL, ...) {
@@ -280,8 +291,8 @@ taxtable_idtaxa <- function(tax, min_confidence = 0, names = NULL, ...) {
                                        taxon = gsub(" ", "_", .x$taxon),
                                        confidence = .x$confidence / 100)) %>%
     dplyr::mutate_at("taxon", gsub, pattern = "Incertae", replacement = "incertae") %>%
-    dplyr::filter(rank != "rootrank", !startsWith(taxon, "unclassified_"),
-                  confidence >= min_confidence)
+    dplyr::filter(.data$rank != "rootrank", !startsWith(.data$taxon, "unclassified_"),
+                  .data$confidence >= min_confidence)
 }
 
 taxtable_dada2 <- function(tax, names = rownames(tax$tax),
@@ -293,9 +304,9 @@ taxtable_dada2 <- function(tax, names = rownames(tax$tax),
     tibble::as_tibble(rownames = "label") %>%
     tidyr::gather(key = "rank", value = "confidence", -1)
   dplyr::full_join(taxa, conf, by = c("label", "rank")) %>%
-    dplyr::arrange(label) %>%
+    dplyr::arrange(.data$label) %>%
     dplyr::mutate_at("taxon", gsub, pattern = "Incertae", replacement = "incertae") %>%
-    dplyr::filter(!is.na(taxon), confidence >= min_confidence) %>%
+    dplyr::filter(!is.na(.data$taxon), .data$confidence >= min_confidence) %>%
     dplyr::mutate_at("rank", tolower) %>%
     dplyr::mutate_at("rank", rank_factor)
 }
@@ -358,10 +369,10 @@ train_idtaxa <- function(fasta) {
 #### taxon_labels ####
 # make labels summarizing the taxonomy of each sequence
 make_taxon_labels <- function(t) {
-    dplyr::group_by(t, label, rank, n_reads) %>%
+    dplyr::group_by_at(t, c("label", "rank", "n_reads")) %>%
     dplyr::summarize(
       taxon =
-        table(taxon) %>%
+        table(.data$taxon) %>%
         paste0(names(.), collapse = "/") %>%
         gsub(pattern = "(.+/.+)", replacement = "<\\1>") %>%
         gsub(pattern = "(mycota|mycetes|ales|aceae)", replacement = "") %>%
@@ -372,13 +383,13 @@ make_taxon_labels <- function(t) {
         gsub(pattern = "Chytridio\\b", replacement = "Chy") %>%
         gsub(pattern = "Zygo\\b", replacement = "Z")
     ) %>%
-    dplyr::group_by(label, n_reads) %>%
+    dplyr::group_by_at(c("label", "n_reads")) %>%
     dplyr::arrange(rank) %>%
     dplyr::summarize(
       tip_label = paste(
-        label[1],
-        format(n_reads[1], width = 5),
-        paste0(taxon, collapse = "-")
+        .data$label[1],
+        format(.data$n_reads[1], width = 5),
+        paste0(.data$taxon, collapse = "-")
       )
     )
 }
@@ -407,13 +418,13 @@ clade_taxon <- function(tree, tax, node, rank) {
   } else {
     for (child in children) {
       tips <- tree$tip.label[phangorn::Descendants(tree, child, type = "tips")[[1]]]
-      taxa <- dplyr::filter(tax, label %in% tips, rank == !!rank)
+      taxa <- dplyr::filter(tax, .data$label %in% tips, rank == !!rank)
       if (nrow(taxa) == 0) return(NA_character_)
     }
     tips <- tree$tip.label[phangorn::Descendants(tree, node, type = "tips")[[1]]]
   }
-  taxa <- dplyr::filter(tax, label %in% tips, rank == !!rank) %>%
-    dplyr::group_by(label)
+  taxa <- dplyr::filter(tax, .data$label %in% tips, .data$rank == !!rank) %>%
+    dplyr::group_by_at("label")
 
   # If there are no relevant taxon assignments, then we can't do anything.
   if (nrow(taxa) == 0) return(NA_character_)
@@ -439,7 +450,7 @@ new_phylotax_env <- function(tree, taxa, parent = parent.frame()) {
       rank = taxa$rank[FALSE],
       taxon = character()
     ),
-    tip_taxa = dplyr::filter(taxa, label %in% tree$tip.label),
+    tip_taxa = dplyr::filter(taxa, .data$label %in% tree$tip.label),
     tree = tree
   )
 }
@@ -469,9 +480,9 @@ phylotax_ <- function(tree, taxa, node, ranks, e) {
       tips <- tree$tip.label[phangorn::Descendants(tree, node, type = "tips")[[1]]]
       wrongTaxa <- e$tip_taxa %>%
         dplyr::filter(
-          label %in% tips,
-          rank == r,
-          taxon != !!taxon
+          .data$label %in% tips,
+          .data$rank == r,
+          .data$taxon != !!taxon
         ) %>%
         dplyr::select(-rank, -taxon, -n_tot, -n_diff, -n_reads, -confidence, -n_method, -n_reference)
       newAssign <- tibble::tibble(
@@ -482,8 +493,8 @@ phylotax_ <- function(tree, taxa, node, ranks, e) {
       )
       # remove assignments which are not consistent with the one we just chose
       e$tip_taxa <- dplyr::bind_rows(
-        dplyr::filter(e$tip_taxa, rank < r),
-        dplyr::filter(e$tip_taxa, rank >= r) %>%
+        dplyr::filter(e$tip_taxa, .data$rank < r),
+        dplyr::filter(e$tip_taxa, .data$rank >= r) %>%
           dplyr::anti_join(wrongTaxa, by = names(wrongTaxa)),
         newAssign
       )
