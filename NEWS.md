@@ -1,5 +1,9 @@
 # phylotax 0.0.2
 
+* The undocumented requirement for the "`taxa`" argument to `phylotax()` to
+  already include columns `n_tot` and `n_diff` is removed. `phylotax()` now
+  generated these columns internally and deletes them when it is done, which
+  will clobber these columns if they are present in the input.
 * `phylotax()` gains a "`method`" argument, used to specify which of the
   columns in the input taxonomic assignment table are used to distinguish
   different primary methods, and what values should be used for assignments

@@ -488,6 +488,15 @@ relabel_tree <- function(tree, old, new, chimeras = character(0)) {
   tree
 }
 
+count_assignments <- function(taxa) {
+  dplyr::group_by_at(taxa, c("label", "rank")) %>%
+    dplyr::mutate(
+      n_diff = dplyr::n_distinct(.data$taxon),
+      n_tot = dplyr::n()
+    ) %>%
+    dplyr::ungroup()
+}
+
 # If all members of the clade are assigned uniquely to one taxon, then assign
 # that taxon
 # Otherwise, if there exists one taxon that is at least one of the possibilities
@@ -645,9 +654,11 @@ phylotax <- function(
 ) {
   method <- check_method(taxa, method)
   taxa <- check_ranks(taxa, ranks)
-  e <- new_phylotax_env(tree, taxa, ranks)
+  e <- new_phylotax_env(tree, count_assignments(taxa), ranks)
   ranks <- sort(unique(taxa$rank))
   phylotax_(tree, taxa, phangorn::getRoot(tree), ranks, method, e)
+  e$tip_taxa$n_tot <- NULL
+  e$tip_taxa$n_diff <- NULL
   as.list(e)
 }
 
