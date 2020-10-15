@@ -1,7 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# phylotax
+phylotax
+========
 
 <!-- badges: start -->
 
@@ -11,7 +12,8 @@ status](https://travis-ci.com/brendanf/phylotax.svg?branch=master)](https://trav
 coverage](https://codecov.io/gh/brendanf/phylotax/branch/master/graph/badge.svg)](https://codecov.io/gh/brendanf/phylotax?branch=master)
 <!-- badges: end -->
 
-## Installation
+Installation
+------------
 
 Install the development version from [GitHub](https://github.com/) with:
 
@@ -20,7 +22,8 @@ Install the development version from [GitHub](https://github.com/) with:
 devtools::install_github("brendanf/phylotax")
 ```
 
-## Usage
+Usage
+-----
 
 The PHYLOTAX algorithm takes as input taxonomic annotations from one or
 more primary taxonomic assignment algoirthms, and refines them using a
@@ -40,15 +43,14 @@ plot(example_tree(), show.node.label = TRUE)
 
 And here is a set of taxonomic assignments for the tips of the tree,
 based on two hypothetical primary assignment algorithms “XTAX” and
-“YTAX”. Some of the tips have been assigned to two genera: “Tax1”
-and “Tax2”. The `phylotax` package includes the function `taxtable()`
-which can generate a table of this type based on the output of various
-primary assignment algorithms, but all that’s important is that it
-contains the columns “label”, “rank”, and “taxon”. The ranks need to be
-one of “rootrank”, “domain”, “kingdom”, “phylum”, “class”, “order”,
-“family”, “genus”, and “species”. Our example also has a “method”
-column, which PHYLOTAX uses to identify which assignments come from the
-same source.
+“YTAX”. Some of the tips have been assigned to two genera: “Tax1” and
+“Tax2”. The `phylotax` package includes the function `taxtable()` which
+can generate a table of this type based on the output of various primary
+assignment algorithms, but all that’s important is that it contains the
+columns “label”, “rank”, and “taxon”. The ranks need to be one of
+“rootrank”, “domain”, “kingdom”, “phylum”, “class”, “order”, “family”,
+“genus”, and “species”. Our example also has a “method” column, which
+PHYLOTAX uses to identify which assignments come from the same source.
 
 ``` r
 example_taxa()
@@ -87,28 +89,46 @@ tree supports it.
 
 ``` r
 phylotax_out <- phylotax(tree = example_tree(), taxa = example_taxa())
-#> INFO [2020-10-14 17:35:34] Assigned node 9 and its 2 children to genus Tax2.
-#> INFO [2020-10-14 17:35:34] Assigned node 10 and its 2 children to genus Tax1.
+#> INFO [2020-10-15 15:02:50] Assigned node 3 and its 2 children to genus Tax2.
+#> INFO [2020-10-15 15:02:50] Assigned node 4 and its 2 children to genus Tax1.
 ```
 
-PHYLOTAX returns a list containing the tree, taxa assigned to tips, and
-taxa assigned to nodes. Let’s look at the tip taxa assignments.
+PHYLOTAX returns a list of class “`phylotax`” containing the tree, taxa
+assignments for tips and internal nodes, as well as tables dividing the
+primary assignments into those which were rejected, those which were
+retained, and those which were missing from the input tree.
 
 ``` r
 phylotax_out$tip_taxa
-#> # A tibble: 10 x 4
-#>    label method   rank  taxon
-#>    <chr> <chr>    <ord> <chr>
-#>  1 C     XTAX     genus Tax2 
-#>  2 B     YTAX     genus Tax2 
-#>  3 C     YTAX     genus Tax2 
-#>  4 D     YTAX     genus Tax1 
-#>  5 F     YTAX     genus Tax1 
-#>  6 B     PHYLOTAX genus Tax2 
-#>  7 C     PHYLOTAX genus Tax2 
-#>  8 E     PHYLOTAX genus Tax1 
-#>  9 F     PHYLOTAX genus Tax1 
-#> 10 D     PHYLOTAX genus Tax1
+#> # A tibble: 5 x 4
+#>   label method   rank  taxon
+#>   <chr> <chr>    <ord> <chr>
+#> 1 B     PHYLOTAX genus Tax2 
+#> 2 C     PHYLOTAX genus Tax2 
+#> 3 E     PHYLOTAX genus Tax1 
+#> 4 F     PHYLOTAX genus Tax1 
+#> 5 D     PHYLOTAX genus Tax1
+```
+
+``` r
+phylotax_out$retained
+#> # A tibble: 5 x 4
+#>   label method rank  taxon
+#>   <chr> <chr>  <ord> <chr>
+#> 1 C     XTAX   genus Tax2 
+#> 2 B     YTAX   genus Tax2 
+#> 3 C     YTAX   genus Tax2 
+#> 4 D     YTAX   genus Tax1 
+#> 5 F     YTAX   genus Tax1
+```
+
+``` r
+phylotax_out$rejected
+#> # A tibble: 2 x 4
+#>   label method rank  taxon
+#>   <chr> <chr>  <ord> <chr>
+#> 1 B     XTAX   genus Tax1 
+#> 2 D     XTAX   genus Tax2
 ```
 
 Phylotax has used the following logic:

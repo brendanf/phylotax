@@ -1,3 +1,20 @@
+# phlotax 0.0.3
+
+* **BREAKING CHANGE** `phylotax` returns taxonomic tables in four categories;
+  * "`tip_taxa`" is the assignments which PHYLOTAX has made itself.
+  * "`rejected`" are primary assignments which PHYLOTAX has rejected.
+  * "`retained`" are primary assignments which PHYLOTAX has not rejected;
+    however some of them may still be ambiguous.
+  * "`missing`" are primary assignments whose labels are not present in the
+    tree, so PHYLOTAX has not done anything with them. (But note that this will
+    be empty if no tree was given).
+* `phylotax()` now returns an S3 object of class "`phylotax`".  This should not
+  break anything, and it allows the possibility of nice improvements in the
+  future.
+* `phylotax()$node_taxa` now includes a "`label`" column, and populates it with
+  node labels if they exist, or just the numbers if they don't.  Node labels are
+  also used in trace output.
+
 # phylotax 0.0.2.1
 
 * Two quick bugfix, applying to errors in `taxonomy_sintax()` and

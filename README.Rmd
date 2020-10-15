@@ -76,12 +76,23 @@ supports it.
 phylotax_out <- phylotax(tree = example_tree(), taxa = example_taxa())
 ```
 
-PHYLOTAX returns a list containing the tree, taxa assigned to tips,
-and taxa assigned to nodes. Let's look at the tip taxa assignments.
+PHYLOTAX returns a list of class "`phylotax`" containing the tree,
+taxa assignments for tips and internal nodes, as well as tables dividing the
+primary assignments into those which were rejected, those which were retained,
+and those which were missing from the input tree.
 
 ```{r}
 phylotax_out$tip_taxa
 ```
+
+```{r}
+phylotax_out$retained
+```
+
+```{r}
+phylotax_out$rejected
+```
+
 
 Phylotax has used the following logic:
 

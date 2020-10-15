@@ -36,14 +36,22 @@ with values/levels from the set rootrank, domain, kingdom, phylum, class, order,
 how to identify different methods. See details.}
 }
 \value{
-a list with two elements, "tip_taxa" and "node_taxa". "tip_taxa" is
-a \code{tibble::tibble()} with the same format as \code{taxa}, in
-which assignments which are inconsistent with the phylogeny have been
-removed, and new assignments deduced or confirmed from the phylogeny.
-These are identified by the value "phylotax" in the "method" column,
-which is created if it does not already exist.  "node_taxa" has columns
-"node", "rank" and "taxon", giving taxonomic assignments for the nodes of
-the tree.
+an S3 object with class "\code{phylotax}", with five elements:
+\itemize{
+\item "\code{tip_taxa} a \code{tibble::tibble()} with the same format as \code{taxa}, containing
+taxonomy assignments made by PHYLOTAX to tips.
+\item "\code{node_taxa}" a \code{tibble::tibble()} with columns "\code{node}", "\code{label}",
+"\code{rank}" and "\code{taxon}" giving taxonomy assignments made by PHYLOTAX to
+internal nodes.
+\item "\code{rejected}" a \code{tibble::tibble()} with the same format as \code{taxa} giving
+primary assignments which have been rejected by PHYLOTAX.
+\item "\code{retained}" a \code{tibble::tibble()} with the same format as \code{taxa} giving
+primary assignments which have not been rehected by PHYLOTAX. These may
+contain inconsistencies that PHYLOTAX was unable to resolve.
+\item "\code{missing}" a \code{tibble::tibble()} with the same format as \code{taxa}, giving the
+primary assignments which have not been assessed by PHULOTAX because they
+have labels which are not present on the tree.
+}
 }
 \description{
 Assign taxon labels to nodes in a tree when there is a consensus of IDs on descendent tips.
