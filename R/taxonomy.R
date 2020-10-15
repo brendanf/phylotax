@@ -88,8 +88,8 @@ check_method <- function(taxa, method) {
 #' algorithms (i.e., those which assign taxonomy based on a taxonomically
 #' classified reference sequence database, but not based on the results of other
 #' algorithms) from other R packages or external programs.
-#' 
-#' 
+#'
+#'
 #'
 #' @param seq (`character`` vector or something that can be coerced to
 #' one, or a matrix with sequences as the column names ) Sequences to
@@ -230,7 +230,9 @@ taxonomy_sintax <- function(seq, reference, min_confidence = NULL, multithread =
   args <- c(args, "--tabbedout", tablefile)
   on.exit(file.remove(tablefile))
 
-  if (!missing(min_confidence)) args <- c(args, "--sintax_cutoff", min_confidence)
+  if (!missing(min_confidence)) {
+    args <- c(args, "--sintax_cutoff", min_confidence/100)
+  }
   if (!missing(multithread)) {
     if (isFALSE(multithread)) multithread <- 1
     args <- c(args, "--threads", multithread)
@@ -310,8 +312,6 @@ sintax_format <- function(tax) {
   }
   tax
 }
-
-
 
 
 #' Convert results from different taxonomic assignment algorithms to a uniform
@@ -627,7 +627,7 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
 #' with values/levels from the set `r paste(default_ranks, collapse = ", ")`.
 #' @param method (a single `character` string, or a named `character` vector)
 #' how to identify different methods. See details.
-#' 
+#'
 #' @details # Distinguishing different primary methods
 #' Primary methods can be distinguished in three ways:
 #' 1. Not at all.  For this option, `taxa` should not have a column named
