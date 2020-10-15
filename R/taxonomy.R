@@ -347,7 +347,7 @@ taxtable <- function(tax, ...) {
 #' @rdname taxtable
 #' @export
 taxtable_sintax <- function(tax, min_confidence = 0, ...) {
-  tidyr::separate_rows("tax", "hit", sep = ",") %>%
+  tidyr::separate_rows(tax, "hit", sep = ",") %>%
     dplyr::mutate_at("hit", dplyr::na_if, "") %>%
     tidyr::extract("hit", into = c("rank", "taxon", "confidence"),
                    regex = "([dkpcofgs]):([^(]+)\\(([01]\\.\\d+)\\)") %>%
