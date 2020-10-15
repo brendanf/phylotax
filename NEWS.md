@@ -1,3 +1,8 @@
+# phylotax 0.0.2.1
+
+* Two quick bugfix, applying to errors in `taxonomy_sintax()` and
+  `taxtable_sintax()`.
+
 # phylotax 0.0.2
 
 * The undocumented requirement for the "`taxa`" argument to `phylotax()` to

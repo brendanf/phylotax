@@ -1,7 +1,7 @@
 Package: phylotax
 Type: Package
 Title: Refine taxonomic assignment of environmental sequences using a taxonomic tree
-Version: 0.0.2
+Version: 0.0.2.1
 Authors@R: person(given = "Brendan", family = "Furneaux",
                   email = "brendan.furneaux@gmail.com",
                   role = c("aut", "cre"))
