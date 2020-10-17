@@ -573,10 +573,10 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
       }
       break
     } else {
-      children <- phangorn::Children(tree, node)
+      children <- phangorn::Descendents(tree, node, "tips")
       if (length(children) > 0) {
         futile.logger::flog.info(
-          "Assigned node %s and its %d children to %s %s.",
+          "Assigned node %s and its %d descendents to %s %s.",
           nodelabel, length(children), as.character(r), taxon)
       } else {
         futile.logger::flog.info("Assigned node %s to %s %s.", nodelabel,

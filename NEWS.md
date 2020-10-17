@@ -1,4 +1,10 @@
-# phlotax 0.0.3
+# phylotax (development version)
+
+* `phylotax()` now counts all descendents, not just direct children, in its
+  logged output. This does not change the actual results, just explains them
+  correctly.
+
+# phylotax 0.0.3
 
 * **BREAKING CHANGE** `phylotax` returns taxonomic tables in four categories;
   * "`tip_taxa`" is the assignments which PHYLOTAX has made itself.
