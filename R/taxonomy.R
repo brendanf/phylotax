@@ -567,7 +567,7 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
     if (any(e$node_taxa$node %in% parents & e$node_taxa$rank == r)) next
     taxon <- clade_taxon(tree, e$retained, node, r)
     if (is.na(taxon)) {
-      futile.logger::flog.debug("Could not assign a %s to node %s.", r, nodelabel)
+      futile.logger::flog.debug("Could not assign a %s to node %d.", r, node)
       for (n in phangorn::Children(tree, node)) {
           phylotax_(tree, e$retained, n, ranks, method, e)
       }
@@ -576,16 +576,21 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
       children <- phangorn::Descendents(tree, node, "tips")
       if (length(children) > 0) {
         futile.logger::flog.info(
-          "Assigned node %s and its %d descendents to %s %s.",
-          nodelabel, length(children), as.character(r), taxon)
+          "Assigned node %d and its %d descendents to %s %s.",
+          node, length(children), as.character(r), taxon)
       } else {
-        futile.logger::flog.info("Assigned node %s to %s %s.", nodelabel,
+        futile.logger::flog.info("Assigned node %d to %s %s.", node,
                                  as.character(r), taxon)
       }
       ranks <- ranks[-1]
       e$node_taxa <- dplyr::bind_rows(
         e$node_taxa,
-        tibble::tibble(node = node, label = nodelabel, rank = r, taxon = taxon)
+        tibble::tibble(
+          node = node,
+          label = nodelabel,
+          rank = r,
+          taxon = taxon
+        )
       )
       tips <- tree$tip.label[phangorn::Descendants(tree, node, type = "tips")[[1]]]
       wrongTaxa <- e$retained %>%
