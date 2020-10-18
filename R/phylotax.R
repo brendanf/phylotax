@@ -280,6 +280,10 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
 #' with values/levels from the set `r paste(default_ranks, collapse = ", ")`.
 #' @param method (a single `character` string, or a named `character` vector)
 #' how to identify different methods. See details.
+#' @param cons_method (a single `character` string, or a named `character` vector)
+#' how to identify different methods for the fallback consensus. See details.
+#' @param fallback (`logical`) If `TRUE`, use [lca_consensus()] for tips which
+#' do not have a tree (which may be all of the tips, if no tree is given).
 #'
 #' @details # Distinguishing different primary methods
 #' Primary methods can be distinguished in three ways:
@@ -319,11 +323,15 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
 phylotax <- function(
   tree = NULL, taxa,
   ranks = NULL,
-  method = if (utils::hasName(taxa, "method")) "PHYLOTAX" else NULL
+  method = if (utils::hasName(taxa, "method")) "PHYLOTAX" else NULL,
+  cons_method = method,
+  fallback = TRUE
 ) {
+  checkmate::check_flag(fallback)
   if (is.null(tree)) {
+    stopifnot(isTRUE(fallback) || !is.null(tree))
     futile.logger::flog.info("'tree' is NULL, falling back on LCA consensus...")
-    return(lca_consensus(taxa, ranks, method))
+    return(lca_consensus(taxa, ranks, cons_method))
   }
   checkmate::assert_data_frame(taxa)
   checkmate::assert_subset(c("label", "rank", "taxon"), colnames(taxa))
@@ -339,10 +347,15 @@ phylotax <- function(
       e[[member]][[n]] <- NULL
     }
   }
-  structure(
+  out <- structure(
     as.list(e),
     class = "phylotax"
   )
+  if (fallback && nrow(out$missing)) {
+    lca <- lca_consensus(out$missing, ranks = ranks, method = cons_method)
+    out <- combotax(out, lca, cons_method)
+  }
+  out
 }
 
 #' Simple phylogenetic tree for use in examples
@@ -506,11 +519,11 @@ keep_tips <- function(phylotax, tips, mrca = (!is.null(phylotax$tree)),
 #'   "`method = c(algorithm = "consensus", region = "ITS2")`". Each unique
 #'   combination of values in these columns is treated as a distinct method.
 #'
-#' @return
+#' @return A [phylotax][phylotax()] object.
 #' @export
 lca_consensus <- function(
   taxa, ranks = NULL,
-  method = if (utils::hasName(taxa, "method")) "LCA" else NULL
+  method = if (utils::hasName(taxa, "method")) "consensus" else NULL
 ) {
   checkmate::assert_data_frame(taxa)
   checkmate::assert_subset(c("label", "rank", "taxon"), colnames(taxa))
@@ -545,8 +558,12 @@ lca_consensus <- function(
   )
 }
 
-combotax <- function(phylotax, lca = NULL, method = if (utils::hasName(phylotax$assigned, "method")) "PHYLOTAX" else NULL) {
-  method <- phylotax:::check_method(phylotax$assigned, method)
+combotax <- function(
+  phylotax,
+  lca = NULL,
+  method = if (utils::hasName(phylotax$assigned, "method")) "PHYLOTAX" else NULL
+) {
+  method <- check_method(phylotax$assigned, method)
   assertthat::assert_that(methods::is(phylotax, "phylotax"))
   if (is.null(lca)) {
     lca <- lca_consensus(phylotax$missing, method = method)

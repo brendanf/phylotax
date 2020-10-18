@@ -1,5 +1,7 @@
 # phylotax (development version)
 
+* `phylotax()` automatically calls `lca_consensus()` for any labels which are
+  missing from the tree.  This can be disabled with `fallback=FALSE`.
 * Node labels given in addition to node numbers, it was very confusing to use
   only the node labels when they were actually bootstrap values (a common
   situation).

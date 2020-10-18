@@ -9,7 +9,9 @@ phylotax(
   tree = NULL,
   taxa,
   ranks = NULL,
-  method = if (utils::hasName(taxa, "method")) "PHYLOTAX" else NULL
+  method = if (utils::hasName(taxa, "method")) "PHYLOTAX" else NULL,
+  cons_method = method,
+  fallback = TRUE
 )
 }
 \arguments{
@@ -35,6 +37,12 @@ with values/levels from the set rootrank, domain, kingdom, phylum, class, order,
 
 \item{method}{(a single \code{character} string, or a named \code{character} vector)
 how to identify different methods. See details.}
+
+\item{cons_method}{(a single \code{character} string, or a named \code{character} vector)
+how to identify different methods for the fallback consensus. See details.}
+
+\item{fallback}{(\code{logical}) If \code{TRUE}, use \code{\link[=lca_consensus]{lca_consensus()}} for tips which
+do not have a tree (which may be all of the tips, if no tree is given).}
 }
 \value{
 an S3 object with class "\code{phylotax}", with five elements:

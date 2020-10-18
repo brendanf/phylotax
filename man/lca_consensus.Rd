@@ -7,7 +7,7 @@
 lca_consensus(
   taxa,
   ranks = NULL,
-  method = if (utils::hasName(taxa, "method")) "LCA" else NULL
+  method = if (utils::hasName(taxa, "method")) "consensus" else NULL
 )
 }
 \arguments{
@@ -30,7 +30,7 @@ with values/levels from the set rootrank, domain, kingdom, phylum, class, order,
 how to identify different methods. See details.}
 }
 \value{
-
+A \link[=phylotax]{phylotax} object.
 }
 \description{
 This is an alternative to \code{\link[=phylotax]{phylotax()}} which does not require a phylogenetic
