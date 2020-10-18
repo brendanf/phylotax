@@ -396,10 +396,25 @@ make_taxon_labels <- function(t) {
 }
 
 #### relabel_tree ####
-# replaces tree tip labels from old with labels from new
-relabel_tree <- function(tree, old, new, chimeras = character(0)) {
-  tree <- ape::drop.tip(tree, intersect(chimeras, tree$tip.label))
+#' Replace tree tip labels
+#'
+#' @param tree ([phylo][ape::read.tree()] object) phylogenetic tree with tip labels
+#' @param old (`character`) Tip labels from `tree` which should be changed.
+#' This does not have to be all the labels in the tree.
+#' @param new (`character`) Replacement tip labels.  Should have the same length
+#' as `old`.
+#' @param quote (`logical`) If TRUE, double quotes are added around the values
+#' in `new` before they are used for replacement.  This is helpful if they (may)
+#' contain characters which will must be quoted in Newick format.
+#' @param drop (`character`) (optional) Tip labels which should be dropped
+#' before replacement.
+#'
+#' @return The tree with modified tip labels.
+#' @export
+relabel_tree <- function(tree, old, new, quote = FALSE, drop = character(0)) {
+  tree <- ape::drop.tip(tree, intersect(drop, tree$tip.label))
+  if (isTRUE(quote)) new <- paste0('"', new, '"')
   tree$tip.label <-
-    plyr::mapvalues(tree$tip.label, old, paste0('"', new, '"'), warn_missing = FALSE)
+    plyr::mapvalues(tree$tip.label, old, new, warn_missing = FALSE)
   tree
 }

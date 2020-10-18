@@ -3,6 +3,7 @@
 export(example_taxa)
 export(example_tree)
 export(phylotax)
+export(relabel_tree)
 export(taxonomy)
 export(taxonomy_dada2)
 export(taxonomy_idtaxa)

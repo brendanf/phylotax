@@ -1,5 +1,7 @@
 # phylotax (development version)
 
+* Additional utility function `relabel_tree()` maps the tip labels of a tree
+  to new values.
 * Fixed a bug where PHYLOTAX would not make assignments inside an implicit
   *incertae sedis* taxon; e.g. assignments exist for a order and genus, but
   not for family, because there is genuine taxonomic uncertainty about which
