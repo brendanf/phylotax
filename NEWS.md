@@ -1,4 +1,7 @@
 # phylotax (development version)
+
+* New function `make_taxon_labels()` summarizes taxonomic assignments so that
+  they can fit as the tip labels on a tree.
 * **BREAKING CHANGE** Renamed the `phylotax` class elements "`tip_taxa`" ->
   "`assigned`" and "`node_taxa`" -> "`node_assigned`", to be more consistent
   with the other class elements (`accepted`, `rejected`, `missing`)

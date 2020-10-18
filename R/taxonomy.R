@@ -366,36 +366,88 @@ train_idtaxa <- function(fasta) {
 
 }
 
+abbrev_myco_taxa <- function() {
+  tibble::tribble(
+    ~pattern, ~replacement,
+    "(mycota|mycetes|ales|aceae)", "",
+    "incertae_sedis", "i_s",
+    "Fungi\\b", "F",
+    "Basidio\\b", "B",
+    "Asco\\b", "A",
+    "Chytridio\\b", "Chy",
+    "Mucoro\\b", "Muc",
+    "Glomero\\b", "Glo"
+  )
+}
 
-#### taxon_labels ####
-# make labels summarizing the taxonomy of each sequence
-make_taxon_labels <- function(t) {
-    dplyr::group_by_at(t, c("label", "rank", "n_reads")) %>%
-    dplyr::summarize(
-      taxon =
-        table(.data$taxon) %>%
-        paste0(names(.), collapse = "/") %>%
-        gsub(pattern = "(.+/.+)", replacement = "<\\1>") %>%
-        gsub(pattern = "(mycota|mycetes|ales|aceae)", replacement = "") %>%
-        gsub(pattern = "incertae_sedis", replacement = "i_s") %>%
-        gsub(pattern = "Fungi\\b", replacement = "F") %>%
-        gsub(pattern = "Basidio\\b", replacement = "B") %>%
-        gsub(pattern = "Asco\\b", replacement = "A") %>%
-        gsub(pattern = "Chytridio\\b", replacement = "Chy") %>%
-        gsub(pattern = "Zygo\\b", replacement = "Z")
-    ) %>%
+condense_taxa <- function(taxa, abbrev = FALSE) {
+  checkmate::assert_character(taxa)
+  checkmate::assert(
+    checkmate::check_flag(abbrev),
+    checkmate::check_data_frame(abbrev)
+  )
+  taxa <- table(taxa)
+  labels <- paste0(taxa, names(taxa), collapse = "/")
+  labels <- gsub(pattern = "(.+/.+)", replacement = "<\\1>", labels)
+  if (isFALSE(abbrev)) return(labels)
+  if (isTRUE(abbrev)) abbrev <- abbrev_myco_taxa()
+  checkmate::check_subset(c("pattern", "replacement"), colnames(abbrev))
+  for (i in seq_len(nrow(abbrev))) {
+    labels <- gsub(abbrev$pattern[i], abbrev$replacement[i], labels)
+  }
+  labels
+}
+
+collapse_non_na <- function(x) {
+  x <- x[!is.na(x)]
+  if (dplyr::n_distinct(x) == 1) unique(x) else NA
+}
+
+
+#' Make labels summarizing the taxonomy of each sequence
+#'
+#' @param t (`data.frame`) Taxonomy assignments to summarize. At a minimum,
+#' should include columns "`label`", "`rank`", and "`taxon`".
+#' @param cols (`character`) (optional) Additional columns from `t` which will
+#' be included in the output. They should be identical for each value of
+#' "`label`".
+#' @param abbrev (`logical` or `data.frame`) If `TRUE`, use a standard set of
+#' abbreviations for mycological taxon names.  Alternatively, define your own
+#' abbreviations using a `data.frame` with columns "`pattern`" and
+#' "`replacement`", which are passed on to [gsub()].
+#'
+#' @details The standard abbreviations are:
+#'
+#' `r gsub("\\", "&#92;&#92;", knitr::kable(abbrev_myco_taxa()))`
+#'
+#' @return A `character` vector giving the new taxon labels.
+#' @export
+make_taxon_labels <- function(t, cols = character(), abbrev = FALSE) {
+  checkmate::assert_data_frame(t)
+  checkmate::assert_subset(c("label", "rank", "taxon"), colnames(t))
+  checkmate::assert_character(cols)
+  checkmate::assert_subset(cols, colnames(t))
+  dplyr::group_by_at(t, c("label", "rank")) %>%
+    dplyr::summarize_at(
+      c("taxon", cols),
+      c(
+        list(~ condense_taxa(., abbrev = abbrev)),
+        rep(list(collapse_non_na), length(cols))
+      )
+    )%>%
     dplyr::group_by_at(c("label", "n_reads")) %>%
     dplyr::arrange(rank) %>%
     dplyr::summarize(
-      tip_label = paste(
-        .data$label[1],
-        format(.data$n_reads[1], width = 5),
-        paste0(.data$taxon, collapse = "-")
+      tip_label = do.call(
+        paste,
+        c(
+          list(.data$label[1])),
+        .data[cols],
+        list(paste0(.data$taxon, collapse = "-"))
       )
     )
 }
 
-#### relabel_tree ####
 #' Replace tree tip labels
 #'
 #' @param tree ([phylo][ape::read.tree()] object) phylogenetic tree with tip labels
