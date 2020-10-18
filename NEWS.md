@@ -1,4 +1,5 @@
 # phylotax (development version)
+
 * Node labels are no longer used in trace output, this was very confusing when
   the node labels were actually bootstrap values (a common situation).
 * `phylotax()` now counts all descendents, not just direct children, in its

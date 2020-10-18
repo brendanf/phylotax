@@ -491,8 +491,8 @@ relabel_tree <- function(tree, old, new, chimeras = character(0)) {
 count_assignments <- function(taxa) {
   dplyr::group_by_at(taxa, c("label", "rank")) %>%
     dplyr::mutate(
-      n_diff = dplyr::n_distinct(.data$taxon),
-      n_tot = dplyr::n()
+      ..phylotax_n_diff = dplyr::n_distinct(.data$taxon),
+      ..phylotax_n_tot = dplyr::n()
     ) %>%
     dplyr::ungroup()
 }
@@ -524,7 +524,7 @@ clade_taxon <- function(tree, tax, node, rank) {
   if (nrow(taxa) == 0) return(NA_character_)
   # If only one thing is assigned, then assign that.
   if (dplyr::n_distinct(taxa$taxon) == 1) return(unique(taxa$taxon))
-  best_taxon <- unique(taxa$taxon[taxa$n_diff == 1])
+  best_taxon <- unique(taxa$taxon[taxa$..phylotax_n_diff == 1])
   if (length(best_taxon) > 1) return(NA_character_)
   consensus_taxon <-
     dplyr::group_map(taxa, ~ unique(.$taxon)) %>%
@@ -695,7 +695,7 @@ phylotax <- function(
   ranks <- sort(unique(taxa$rank))
   phylotax_(tree, taxa, phangorn::getRoot(tree), ranks, method, e)
   for (member in c("missing", "retained", "rejected", "tip_taxa"))
-    for (n in c("n_tot", "n_diff"))
+    for (n in c("..phylotax_n_tot", "..phylotax_n_diff"))
       e[[member]][[n]] <- NULL
   structure(
     as.list(e),
