@@ -186,10 +186,12 @@ new_phylotax_env <- function(tree, taxa, parent = parent.frame()) {
 
 phylotax_ <- function(tree, taxa, node, ranks, method, e) {
   if (length(ranks) == 0) return()
-  nodelabel <- if (!is.null(tree$node.label)) {
-    tree$node.label[node - ape::Ntip(tree)]
+  if (!is.null(tree$node.label)) {
+    nodelabel <- tree$node.label[node - ape::Ntip(tree)]
+    nodename <- sprintf("%d (label: %s)", node, nodelabel)
   } else {
-    as.character(node)
+    nodelabel <- as.character(node)
+    nodename <- nodelabel
   }
   parents <- phangorn::Ancestors(tree, node, type = "all")
   for (r in ranks) {
@@ -197,21 +199,21 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
     if (any(e$node_assigned$node %in% parents & e$node_assigned$rank == r)) next
     taxon <- clade_taxon(tree, e$retained, node, r)
     if (is.na(taxon)) {
-      futile.logger::flog.debug("Could not assign a %s to node %d.", r, node)
+      futile.logger::flog.debug("Could not assign a %s to node %s.", r, nodename)
       for (n in phangorn::Children(tree, node)) {
         phylotax_(tree, e$retained, n, ranks, method, e)
       }
       break
     } else {
-      children <- phangorn::Descendants(tree, node, "tips")
+      children <- phangorn::Descendants(tree, node, "tips")[[1]]
       if (taxon != "..phylotax_placeholder.."){
         if (length(children) > 0) {
           futile.logger::flog.info(
-            "Assigned node %d and its %d descendant(s) to %s %s.",
-            node, length(children), as.character(r), taxon)
+            "Assigned node %s and its %d descendant(s) to %s %s.",
+            nodename, length(children), as.character(r), taxon)
         } else {
-          futile.logger::flog.info("Assigned node %d to %s %s.", node,
-                                   as.character(r), taxon)
+          futile.logger::flog.info("Assigned node %s to %s %s.", node,
+                                   as.character(r), nodename)
         }
       }
       ranks <- ranks[-1]

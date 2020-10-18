@@ -89,8 +89,8 @@ tree supports it.
 
 ``` r
 phylotax_out <- phylotax(tree = example_tree(), taxa = example_taxa())
-#> INFO [2020-10-15 15:02:50] Assigned node 3 and its 2 children to genus Tax2.
-#> INFO [2020-10-15 15:02:50] Assigned node 4 and its 2 children to genus Tax1.
+#> INFO [2020-10-18 17:19:19] Assigned node 9 (label: 3) and its 2 descendant(s) to genus Tax2.
+#> INFO [2020-10-18 17:19:19] Assigned node 10 (label: 4) and its 3 descendant(s) to genus Tax1.
 ```
 
 PHYLOTAX returns a list of class “`phylotax`” containing the tree, taxa
@@ -99,7 +99,7 @@ primary assignments into those which were rejected, those which were
 retained, and those which were missing from the input tree.
 
 ``` r
-phylotax_out$tip_taxa
+phylotax_out$assigned
 #> # A tibble: 5 x 4
 #>   label method   rank  taxon
 #>   <chr> <chr>    <ord> <chr>

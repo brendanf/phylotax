@@ -1,5 +1,8 @@
 # phylotax (development version)
 
+* Node labels given in addition to node numbers, it was very confusing to use
+  only the node labels when they were actually bootstrap values (a common
+  situation).
 * New function `lca_consensus()` calculates rankwise strict consensus.
   If no tree is give, `phylotax()` now dispatched to `lca_consensus()`, which is
   MUCH faster than calculating `phylotax()` on a star tree.
@@ -17,8 +20,6 @@
   *incertae sedis* taxon; e.g. assignments exist for a order and genus, but
   not for family, because there is genuine taxonomic uncertainty about which
   family the genus belongs in.
-* Node labels are no longer used in trace output, this was very confusing when
-  the node labels were actually bootstrap values (a common situation).
 * `phylotax()` now counts all descendents, not just direct children, in its
   logged output. This does not change the actual results, just explains them
   correctly.
