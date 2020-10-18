@@ -47,7 +47,7 @@ taxonomy <- function(seq, reference, method, min_confidence = 50, multithread = 
     seq <- as.character(seq)
     names(seq) <- seqnames
   }
-  is.RNA <- stringr::str_detect(seq[1], "[Uu]")
+  is.RNA <- grepl("[Uu]", seq[1])
   # seq <- if (is.RNA) Biostrings::RNAStringSet(seq) else Biostrings::DNAStringSet(seq)
 
   f <- switch(method,
@@ -107,7 +107,7 @@ taxonomy_sintax <- function(seq, reference, min_confidence = NULL, multithread =
                             seq = as.character(seq@sread, use.names = FALSE))
     } else if (is.character(seq)) {
       if (is.null(names(seq))) names(seq) <- seqhash(seq)
-      is.RNA <- any(stringr::str_detect(seq, "[Uu]"))
+      is.RNA <- any(grepl( "[Uu]", seq))
       if (is.RNA) {
         seq <- Biostrings::RNAStringSet(chartr("Tt", "Uu", seq))
       } else {
@@ -132,7 +132,7 @@ taxonomy_sintax <- function(seq, reference, min_confidence = NULL, multithread =
       ShortRead::writeFasta(reference, dbfile)
     } else if (is.character(reference)) {
       if (is.null(names(reference))) stop("Taxonomy database given as character vector must be named.")
-      is.RNA <- stringr::str_detect(reference[1], "[Uu]")
+      is.RNA <- grepl("[Uu]", reference[1])
       if (is.RNA) {
         reference <- Biostrings::RNAStringSet(reference)
       } else {

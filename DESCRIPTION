@@ -39,7 +39,6 @@ Imports:
    readr,
    rlang,
    seqinr,
-   stringr,
    taxa,
    tibble,
    tidyr
