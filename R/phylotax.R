@@ -113,7 +113,7 @@ interpolate_ranks <- function(taxa, method) {
 
 # remove the dummy taxa added by interpolate_ranks
 deinterpolate_ranks <- function(taxa) {
-  dplyr::filter(taxa, taxon != "..phylotax_placeholder..")
+  dplyr::filter(taxa, .data$taxon != "..phylotax_placeholder..")
 }
 
 

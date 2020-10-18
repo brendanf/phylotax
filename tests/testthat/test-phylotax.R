@@ -33,7 +33,7 @@ incertae_target <- dplyr::mutate_at(
 
 test_that("assignments work for incertae sedis taxa", {
   expect_true(dplyr::all_equal(
-    phylotax::phylotax(incertae_tree, incertae_taxon)$node_assigned,
+    phylotax(incertae_tree, incertae_taxon)$node_assigned,
     incertae_target,
     convert = TRUE
   ))
