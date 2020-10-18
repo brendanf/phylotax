@@ -1,5 +1,8 @@
 # phylotax (development version)
 
+* New function `lca_consensus()` calculates rankwise strict consensus.
+  If no tree is give, `phylotax()` now dispatched to `lca_consensus()`, which is
+  MUCH faster than calculating `phylotax()` on a star tree.
 * New function `make_taxon_labels()` summarizes taxonomic assignments so that
   they can fit as the tip labels on a tree.
 * **BREAKING CHANGE** Renamed the `phylotax` class elements "`tip_taxa`" ->
