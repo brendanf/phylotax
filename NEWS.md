@@ -1,5 +1,7 @@
 # phylotax (development version)
 
+* Added function `keep_tips()` to make subsets of the tips in a `phylotax`
+  object, including the tree and the taxonomic annotations.
 * Additional utility function `relabel_tree()` maps the tip labels of a tree
   to new values.
 * Fixed a bug where PHYLOTAX would not make assignments inside an implicit

@@ -150,7 +150,7 @@ clade_taxon <- function(tree, tax, node, rank) {
   }
   taxa <- dplyr::filter(tax, .data$label %in% tips, .data$rank == !!rank) %>%
     dplyr::group_by_at("label")
-  
+
   # If there are no relevant taxon assignments, then we can't do anything.
   if (nrow(taxa) == 0) return(NA_character_)
   # If only one thing is assigned, then assign that.
@@ -371,4 +371,88 @@ example_taxa <- function() {
               NA, "Tax2", "Tax2", "Tax1", NA, "Tax1")
   ) %>%
     dplyr::filter(stats::complete.cases(.))
+}
+
+
+# ape::keep.tip, but also return a map from new tip numbers
+# to old tip numbers
+keep_tips_carefully <- function(tree, tips, keep_fun = ape::keep.tip) {
+  old_node_labels <- tree$node.label
+  old_ntip <- ape::Ntip(tree)
+  tree$node.label <- seq_len(tree$Nnode) + old_ntip
+  tree <- keep_fun(tree, tips)
+  key <- tibble::tibble(
+    new_node = seq_len(tree$Nnode) + ape::Ntip(tree),
+    old_node = tree$node.label
+  )
+  if (is.null(old_node_labels)) {
+    tree$node.label <- NULL
+  } else {
+    tree$node.label <- old_node_labels[key$old_node - old_ntip]
+  }
+  list(
+    tree = tree,
+    key = key
+  )
+}
+
+#' Keep only certain tips from a phylotax object
+#'
+#' This is analogous to [ape::keep.tip], but also takes care of the taxonomic
+#' annotations associated with nodes and tips. It also works for
+#' [phylotax][phylotax()] objects without an associated tree (if `mrca=FALSE`)
+#' and for "tip" labels which are not missing from the tree, but present in
+#' the taxonomic annotations.
+#'
+#' @param phylotax ([phylotax][phylotax()] object)
+#' @param tips (`character` vector) Tip labels to keep
+#' @param mrca (`logical`) If `TRUE`, also keep all tips descended from the most
+#' recent common ancestor (according to the tree) of `tips`. If `FALSE`,
+#' just keep `tips`.
+#' @param invert (`logical`) If `TRUE`, then the named `tips` (and all
+#' descendants of their MRCA if `mrca=TRUE`) are removed, and all other tips are
+#' kept.
+#'
+#' @return A [phylotax][phylotax()] object with the tree and taxonomic
+#' assignments pruned to only include the specified tips.
+#' @export
+keep_tips <- function(phylotax, tips, mrca = (!is.null(phylotax$tree)),
+                      invert = FALSE) {
+  checkmate::assert_class(phylotax, "phylotax")
+  has_tree <- !is.null(phylotax$tree)
+  checkmate::assert_flag(mrca)
+  checkmate::assert_flag(invert)
+  tree_tips <-
+    if (has_tree) intersect(tips, phylotax$tree$tip.label) else character()
+  if (isTRUE(mrca)) {
+    assertthat::assert_that(
+      has_tree,
+      msg = "For mrca=TRUE, the supplied phylotax object must include a tree."
+    )
+    mrca_node <- ape::getMRCA(phylotax$tree, tree_tips)
+    mrca_tips <- phangorn::Descendants(phylotax$tree, mrca_node)[[1]]
+    mrca_tips <- phylotax$tree$tip.label[mrca_tips]
+    tips <- union(tips, mrca_tips)
+    tree_tips <- union(tree_tips, mrca_tips)
+  }
+  if (has_tree) {
+    phylofun <- if(invert) ape::drop.tip else ape::keep.tip
+    newtree <- keep_tips_carefully(phylotax$tree, tree_tips, phylofun)
+    phylotax$tree <- newtree$tree
+    phylotax$node_taxa <- dplyr::filter(
+      phylotax$node_taxa,
+      .data$node %in% newtree$key$old_node
+    )
+    phylotax$node_taxa$node <- plyr::mapvalues(
+      phylotax$node_taxa$node,
+      newtree$key$old_node,
+      newtree$key$new_node
+    )
+  }
+  filterfun <- if (invert) (function(x, y) ! x %in% y) else magrittr::is_in
+  purrr::modify_if(
+    phylotax,
+    ~ all(utils::hasName(., c("rank", "taxon", "label"))),
+    ~ dplyr::filter(., filterfun(.data$label, tips))
+  )
 }

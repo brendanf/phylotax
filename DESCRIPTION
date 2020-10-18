@@ -24,6 +24,7 @@ Imports:
    ape,
    assertthat,
    Biostrings,
+   checkmate,
    dada2,
    DECIPHER,
    digest,
