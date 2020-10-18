@@ -82,6 +82,41 @@ check_method <- function(taxa, method) {
   }
 }
 
+# if the incoming taxonomy has _incertae sedis_ taxa (i.e., the taxonomic
+# classfication skips ranks) then add dummy taxa to fill in those ranks
+interpolate_ranks <- function(taxa, method) {
+  out <- taxa
+  taxa <- dplyr::group_by_at(taxa, c("label", names(method)))
+  ranks <- sort(unique(taxa$rank))
+  for (r in ranks) {
+    # for converts factors to characters
+    if (is.factor(ranks)) {
+      r <- factor(r, levels = levels(ranks), ordered = is.ordered(ranks))
+    }
+    incertae_taxa <- dplyr::filter(
+      taxa,
+      !r %in% .data$rank,
+      r > min(.data$rank),
+      r < max(.data$rank)
+    )
+    incertae_taxa <- dplyr::summarize(
+      incertae_taxa,
+      rank = r,
+      taxon = "..phylotax_placeholder.."
+    )
+    out <- dplyr::bind_rows(
+      out,
+      incertae_taxa
+    )
+  }
+  out
+}
+
+# remove the dummy taxa added by interpolate_ranks
+deinterpolate_ranks <- function(taxa) {
+  dplyr::filter(taxa, taxon != "..phylotax_placeholder..")
+}
+
 #' Assign taxonomy to nucleotide sequences
 #'
 #' This method uses a common interface to call primary taxonomic assignment
@@ -573,14 +608,16 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
       }
       break
     } else {
-      children <- phangorn::Descendents(tree, node, "tips")
-      if (length(children) > 0) {
-        futile.logger::flog.info(
-          "Assigned node %d and its %d descendents to %s %s.",
-          node, length(children), as.character(r), taxon)
-      } else {
-        futile.logger::flog.info("Assigned node %d to %s %s.", node,
-                                 as.character(r), taxon)
+      children <- phangorn::Descendants(tree, node, "tips")
+      if (taxon != "..phylotax_placeholder.."){
+        if (length(children) > 0) {
+          futile.logger::flog.info(
+            "Assigned node %d and its %d descendant(s) to %s %s.",
+            node, length(children), as.character(r), taxon)
+        } else {
+          futile.logger::flog.info("Assigned node %d to %s %s.", node,
+                                   as.character(r), taxon)
+        }
       }
       ranks <- ranks[-1]
       e$node_taxa <- dplyr::bind_rows(
@@ -624,7 +661,8 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
   }
 }
 
-#' Assign taxon labels to nodes in a tree when there is a consensus of IDs on descendent tips.
+#' Assign taxon labels to nodes in a tree when there is a consensus of IDs on
+#' descendant tips.
 #'
 #' @param tree (`ape::phylo()` object) A tree including the taxa to be
 #' classified.  The tip labels should match the "label" column in `taxa`. If no
@@ -691,12 +729,16 @@ phylotax <- function(
   )
   method <- check_method(taxa, method)
   taxa <- check_ranks(taxa, ranks)
+  taxa <- interpolate_ranks(taxa, method)
   e <- new_phylotax_env(tree, count_assignments(taxa), ranks)
   ranks <- sort(unique(taxa$rank))
   phylotax_(tree, taxa, phangorn::getRoot(tree), ranks, method, e)
-  for (member in c("missing", "retained", "rejected", "tip_taxa"))
-    for (n in c("..phylotax_n_tot", "..phylotax_n_diff"))
+  for (member in c("missing", "retained", "rejected", "tip_taxa", "node_taxa")) {
+    e[[member]] <- deinterpolate_ranks(e[[member]])
+    for (n in c("..phylotax_n_tot", "..phylotax_n_diff")) {
       e[[member]][[n]] <- NULL
+    }
+  }
   structure(
     as.list(e),
     class = "phylotax"

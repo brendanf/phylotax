@@ -21,15 +21,19 @@ incertae_taxon <- tibble::tribble(
 incertae_tree <- ape::read.tree(text = "((A,B),C);")
 
 incertae_target <- tibble::tribble(
-  ~node, ~rank, ~taxon,
-  4,     "order", "ord",
-  3,     "family", "fam",
-  5,     "genus",  "gen",
-  2,     "species", "s"
-)
+  ~node, ~rank, ~taxon, ~label,
+  4,     "order", "ord", "4",
+  3,     "family", "fam", "3",
+  5,     "genus",  "gen", "5",
+  2,     "species", "s", "2"
+) %>%
+  dplyr::mutate_at("rank", ordered, levels = default_ranks)
 
 test_that("assignments work for incertae sedis taxa", {
-  expect_true(dplyr::all_equal(phylotax::phylotax(incertae_tree, incertae_taxon)$node_taxa,
-                               incertae_target))
+  expect_true(dplyr::all_equal(
+    phylotax::phylotax(incertae_tree, incertae_taxon)$node_taxa,
+    incertae_target,
+    convert = TRUE
+  ))
 })
 

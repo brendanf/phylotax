@@ -1,5 +1,9 @@
 # phylotax (development version)
 
+* Fixed a bug where PHYLOTAX would not make assignments inside an implicit
+  *incertae sedis* taxon; e.g. assignments exist for a order and genus, but
+  not for family, because there is genuine taxonomic uncertainty about which
+  family the genus belongs in.
 * Node labels are no longer used in trace output, this was very confusing when
   the node labels were actually bootstrap values (a common situation).
 * `phylotax()` now counts all descendents, not just direct children, in its

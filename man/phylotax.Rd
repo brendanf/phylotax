@@ -2,7 +2,8 @@
 % Please edit documentation in R/taxonomy.R
 \name{phylotax}
 \alias{phylotax}
-\title{Assign taxon labels to nodes in a tree when there is a consensus of IDs on descendent tips.}
+\title{Assign taxon labels to nodes in a tree when there is a consensus of IDs on
+descendant tips.}
 \usage{
 phylotax(
   tree = NULL,
@@ -54,7 +55,8 @@ have labels which are not present on the tree.
 }
 }
 \description{
-Assign taxon labels to nodes in a tree when there is a consensus of IDs on descendent tips.
+Assign taxon labels to nodes in a tree when there is a consensus of IDs on
+descendant tips.
 }
 \section{Distinguishing different primary methods}{
 Primary methods can be distinguished in three ways:
