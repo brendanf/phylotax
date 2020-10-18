@@ -1,5 +1,7 @@
 # phylotax (development version)
 
+* New function `extract_taxon()` can be used to extract a particular taxon of
+  interest from the results of `phylotax()` or `lca_consensus()`.
 * `phylotax()` automatically calls `lca_consensus()` for any labels which are
   missing from the tree.  This can be disabled with `fallback=FALSE`.
 * Node labels given in addition to node numbers, it was very confusing to use

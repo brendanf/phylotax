@@ -583,3 +583,45 @@ combotax <- function(
   )
   phylotax
 }
+
+#' Extract a taxon by name from a `phylotax` object
+#'
+#' For a [phylotax][phylotax()] object with a tree, the taxon is extracted based
+#' on node annotations.  If more than one node is annotated as belonging to the
+#' given taxon (i.e., it seems to be para/polyphyletic in the tree) then the
+#' "correct" clade can be chosen by providing "true members"; the result will
+#' only include the clade(s) which contain the "true members".
+#'
+#' If no tree is present (meaning the `phylotax` object was generated using
+#' [lca_consensus()]), and also for sequences which are not present in the tree,
+#' then the chosen taxon is simply extracted using the assigned taxonomy.
+#'
+#' @param phylotax ([phylotax][phylotax()] object) The object to extract from.
+#' @param taxon (`character` string) The name of the taxon to extract.
+#' @param true_members (`character`) (optional) Labels of sequences known to
+#' belong in the taxon.
+#'
+#' @return A [phylotax][phylotax()] object containing only the specified taxon.
+#' @export
+extract_taxon <- function(phylotax, taxon, true_members = NULL) {
+  checkmate::assert_class(phylotax, "phylotax")
+  checkmate::assert_string(taxon)
+  tips <-
+      dplyr::group_by_at(phylotax$assigned, "label") %>%
+      dplyr::filter(!!taxon %in% .data$taxon) %$%
+      unique(label)
+  if (!is.null(phylotax$tree)) {
+    tips <- setdiff(tips, phylotax$tree$tip.label)
+    nodes <- dplyr::filter(phylotax$node_assigned, !!taxon == .data$taxon)
+    if (!is.null(true_members)) {
+      checkmate::assert_character(true_members)
+      nodetips <- phangorn::Descendants(phylotax$tree, nodes, "tips")
+      nodes <- nodes[purrr::map_lgl(nodetips, ~any(. %in% true_members))]
+    }
+    tips <- union(
+      unlist(phangorn::Descendants(phylotax$tree, nodes, "tips")),
+      tips
+    )
+  }
+  keep_tips(phylotax, tips, mrca = FALSE)
+}

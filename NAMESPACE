@@ -2,6 +2,7 @@
 
 export(example_taxa)
 export(example_tree)
+export(extract_taxon)
 export(keep_tips)
 export(lca_consensus)
 export(make_taxon_labels)
