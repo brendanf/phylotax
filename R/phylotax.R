@@ -170,13 +170,13 @@ clade_taxon <- function(tree, tax, node, rank) {
 new_phylotax_env <- function(tree, taxa, parent = parent.frame()) {
   rlang::child_env(
     .parent = parent,
-    node_taxa = tibble::tibble(
+    node_assigned = tibble::tibble(
       node = integer(),
       label = NULL,
       rank = taxa$rank[FALSE],
       taxon = character()
     ),
-    tip_taxa = dplyr::filter(taxa, FALSE),
+    assigned = dplyr::filter(taxa, FALSE),
     retained = dplyr::filter(taxa, .data$label %in% tree$tip.label),
     rejected = dplyr::filter(taxa, FALSE),
     missing = dplyr::filter(taxa, !.data$label %in% tree$tip.label),
@@ -195,7 +195,7 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
   parents <- phangorn::Ancestors(tree, node, type = "all")
   for (r in ranks) {
     if (is.ordered(ranks)) r <- ordered(r, levels = levels(ranks))
-    if (any(e$node_taxa$node %in% parents & e$node_taxa$rank == r)) next
+    if (any(e$node_assigned$node %in% parents & e$node_assigned$rank == r)) next
     taxon <- clade_taxon(tree, e$retained, node, r)
     if (is.na(taxon)) {
       futile.logger::flog.debug("Could not assign a %s to node %d.", r, node)
@@ -216,8 +216,8 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
         }
       }
       ranks <- ranks[-1]
-      e$node_taxa <- dplyr::bind_rows(
-        e$node_taxa,
+      e$node_assigned <- dplyr::bind_rows(
+        e$node_assigned,
         tibble::tibble(
           node = node,
           label = nodelabel,
@@ -242,7 +242,7 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
         newAssign[[n]] <- unname(method[n])
       }
       # remove assignments which are not consistent with the one we just chose
-      e$tip_taxa <- dplyr::bind_rows(e$tip_taxa, newAssign)
+      e$assigned <- dplyr::bind_rows(e$assigned, newAssign)
       e$rejected <- dplyr::bind_rows(
         e$rejected,
         dplyr::filter(e$retained, .data$rank >= r) %>%
@@ -300,9 +300,9 @@ phylotax_ <- function(tree, taxa, node, ranks, method, e) {
 #'   method.
 #'
 #' @return an S3 object with class "`phylotax`", with five elements:
-#' * "`tip_taxa` a `tibble::tibble()` with the same format as `taxa`, containing
+#' * "`assigned` a `tibble::tibble()` with the same format as `taxa`, containing
 #'   taxonomy assignments made by PHYLOTAX to tips.
-#' * "`node_taxa`" a `tibble::tibble()` with columns "`node`", "`label`",
+#' * "`node_assigned`" a `tibble::tibble()` with columns "`node`", "`label`",
 #'   "`rank`" and "`taxon`" giving taxonomy assignments made by PHYLOTAX to
 #'   internal nodes.
 #' * "`rejected`" a `tibble::tibble()` with the same format as `taxa` giving
@@ -329,7 +329,7 @@ phylotax <- function(
   e <- new_phylotax_env(tree, count_assignments(taxa), ranks)
   ranks <- sort(unique(taxa$rank))
   phylotax_(tree, taxa, phangorn::getRoot(tree), ranks, method, e)
-  for (member in c("missing", "retained", "rejected", "tip_taxa", "node_taxa")) {
+  for (member in c("missing", "retained", "rejected", "assigned", "node_assigned")) {
     e[[member]] <- deinterpolate_ranks(e[[member]])
     for (n in c("..phylotax_n_tot", "..phylotax_n_diff")) {
       e[[member]][[n]] <- NULL
@@ -439,12 +439,12 @@ keep_tips <- function(phylotax, tips, mrca = (!is.null(phylotax$tree)),
     phylofun <- if(invert) ape::drop.tip else ape::keep.tip
     newtree <- keep_tips_carefully(phylotax$tree, tree_tips, phylofun)
     phylotax$tree <- newtree$tree
-    phylotax$node_taxa <- dplyr::filter(
-      phylotax$node_taxa,
+    phylotax$node_assigned <- dplyr::filter(
+      phylotax$node_assigned,
       .data$node %in% newtree$key$old_node
     )
-    phylotax$node_taxa$node <- plyr::mapvalues(
-      phylotax$node_taxa$node,
+    phylotax$node_assigned$node <- plyr::mapvalues(
+      phylotax$node_assigned$node,
       newtree$key$old_node,
       newtree$key$new_node
     )

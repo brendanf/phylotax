@@ -39,9 +39,9 @@ how to identify different methods. See details.}
 \value{
 an S3 object with class "\code{phylotax}", with five elements:
 \itemize{
-\item "\code{tip_taxa} a \code{tibble::tibble()} with the same format as \code{taxa}, containing
+\item "\code{assigned} a \code{tibble::tibble()} with the same format as \code{taxa}, containing
 taxonomy assignments made by PHYLOTAX to tips.
-\item "\code{node_taxa}" a \code{tibble::tibble()} with columns "\code{node}", "\code{label}",
+\item "\code{node_assigned}" a \code{tibble::tibble()} with columns "\code{node}", "\code{label}",
 "\code{rank}" and "\code{taxon}" giving taxonomy assignments made by PHYLOTAX to
 internal nodes.
 \item "\code{rejected}" a \code{tibble::tibble()} with the same format as \code{taxa} giving
