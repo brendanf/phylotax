@@ -420,7 +420,7 @@ collapse_non_na <- function(x) {
 #'
 #' `r gsub("\\", "&#92;&#92;", knitr::kable(abbrev_myco_taxa()))`
 #'
-#' @return A `character` vector giving the new taxon labels.
+#' @return A `data.frame` giving the old and new taxon taxon labels.
 #' @export
 make_taxon_labels <- function(t, cols = character(), abbrev = FALSE) {
   checkmate::assert_data_frame(t)
@@ -435,17 +435,19 @@ make_taxon_labels <- function(t, cols = character(), abbrev = FALSE) {
         rep(list(collapse_non_na), length(cols))
       )
     )%>%
-    dplyr::group_by_at(c("label", "n_reads")) %>%
+    dplyr::group_by_at("label") %>%
     dplyr::arrange(rank) %>%
     dplyr::summarize(
-      tip_label = do.call(
+      new = do.call(
         paste,
         c(
-          list(.data$label[1])),
-        .data[cols],
-        list(paste0(.data$taxon, collapse = "-"))
+          list(.data$label[1]),
+          purrr::map(cols, ~ .data[[.]]),
+          list(paste0(.data$taxon, collapse = "-"))
+        )
       )
-    )
+    ) %>%
+    dplyr::rename(old = "label")
 }
 
 #' Replace tree tip labels

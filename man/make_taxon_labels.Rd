@@ -20,7 +20,7 @@ abbreviations using a \code{data.frame} with columns "\code{pattern}" and
 "\code{replacement}", which are passed on to \code{\link[=gsub]{gsub()}}.}
 }
 \value{
-A \code{character} vector giving the new taxon labels.
+A \code{data.frame} giving the old and new taxon taxon labels.
 }
 \description{
 Make labels summarizing the taxonomy of each sequence

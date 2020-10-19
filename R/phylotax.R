@@ -469,13 +469,15 @@ keep_tips <- function(phylotax, tips, mrca = (!is.null(phylotax$tree)),
     phylotax$node_assigned$node <- plyr::mapvalues(
       phylotax$node_assigned$node,
       newtree$key$old_node,
-      newtree$key$new_node
+      newtree$key$new_node,
+      warn_missing = FALSE
     )
   }
   filterfun <- if (invert) (function(x, y) ! x %in% y) else magrittr::is_in
   purrr::modify_if(
     phylotax,
-    ~ all(utils::hasName(., c("rank", "taxon", "label"))),
+    ~ all(utils::hasName(., c("rank", "taxon", "label"))) &
+      !utils::hasName(., "node"),
     ~ dplyr::filter(., filterfun(.data$label, tips))
   )
 }
@@ -582,7 +584,7 @@ combotax <- function(
     dplyr::anti_join(lca$assigned, phylotax$assigned, by = "label")
   )
   phylotax$rejected <- unique(dplyr::bind_rows(phylotax$rejected, lca$rejected))
-  phylotax$retained <- unique(dplyr::bind_rows(phylotax$retainsd, lca$retained))
+  phylotax$retained <- unique(dplyr::bind_rows(phylotax$retained, lca$retained))
   phylotax$missing <- purrr::reduce(
     list(phylotax$missing, phylotax$rejected, phylotax$retained),
     dplyr::anti_join, by = names(method)
@@ -619,14 +621,16 @@ extract_taxon <- function(phylotax, taxon, true_members = NULL) {
     unique()
   if (!is.null(phylotax$tree)) {
     tips <- setdiff(tips, phylotax$tree$tip.label)
-    nodes <- dplyr::filter(phylotax$node_assigned, !!taxon == .data$taxon)
+    nodes <- dplyr::filter(phylotax$node_assigned, !!taxon == .data$taxon)$node
+    nodes <- unique(nodes)
+    nodetips <- phangorn::Descendants(phylotax$tree, nodes, "tips")
+    nodetips <- purrr::map(nodetips, ~ phylotax$tree$tip.label[.])
     if (!is.null(true_members)) {
       checkmate::assert_character(true_members)
-      nodetips <- phangorn::Descendants(phylotax$tree, nodes, "tips")
-      nodes <- nodes[purrr::map_lgl(nodetips, ~any(. %in% true_members))]
+      nodetips <- purrr::keep(nodetips, ~any(. %in% true_members))
     }
     tips <- union(
-      unlist(phangorn::Descendants(phylotax$tree, nodes, "tips")),
+      unlist(nodetips),
       tips
     )
   }

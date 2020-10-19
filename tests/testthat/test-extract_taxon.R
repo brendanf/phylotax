@@ -1,0 +1,10 @@
+test_that("extract_taxon works", {
+  p <- phylotax(example_tree(), example_taxa())
+  p2 <- extract_taxon(p, "Tax1")
+  checkmate::expect_class(p2, "phylotax")
+  checkmate::expect_set_equal(p2$node_assigned$taxon, "Tax1")
+  checkmate::expect_set_equal(p2$assigned$taxon, "Tax1")
+  checkmate::expect_set_equal(p2$retained$taxon, "Tax1")
+  checkmate::expect_set_equal(p2$assigned$label, LETTERS[4:6])
+  checkmate::expect_set_equal(p2$retained$label, LETTERS[c(4, 6)])
+})
