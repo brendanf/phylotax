@@ -86,23 +86,29 @@ check_method <- function(taxa, method) {
 # classfication skips ranks) then add dummy taxa to fill in those ranks
 interpolate_ranks <- function(taxa, method) {
   out <- taxa
-  taxa <- dplyr::group_by_at(taxa, c("label", names(method)))
+  maxranks <- dplyr::group_by_at(taxa, c("label", names(method))) %>%
+    dplyr::summarize(..max_rank.. = max(.data$rank)) %>%
+    dplyr::ungroup()
   ranks <- sort(unique(taxa$rank))
   for (r in ranks) {
     # for converts factors to characters
     if (is.factor(ranks)) {
       r <- factor(r, levels = levels(ranks), ordered = is.ordered(ranks))
     }
-    incertae_taxa <- dplyr::filter(
-      taxa,
-      !r %in% .data$rank,
-      r < max(.data$rank)
+    # it will be faster on each loop if we do this filter destructively now.
+    maxranks <- dplyr::filter(
+      maxranks,
+      r < .data$..max_rank..
     )
-    incertae_taxa <- dplyr::summarize(
+    incertae_taxa <- maxranks
+    incertae_taxa$rank <- r
+    incertae_taxa <- dplyr::anti_join(
       incertae_taxa,
-      rank = r,
-      taxon = "..phylotax_placeholder.."
+      taxa,
+      by = c("label", "rank", names(method))
     )
+    incertae_taxa$taxon <- "..phylotax_placeholder.."
+    incertae_taxa$..max_rank.. <- NULL
     out <- dplyr::bind_rows(
       out,
       incertae_taxa
