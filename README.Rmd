@@ -32,12 +32,22 @@ devtools::install_github("brendanf/phylotax")
 ## Usage
 
 The PHYLOTAX algorithm takes as input taxonomic annotations from one or more
-primary taxonomic assignment algoirthms, and refines them using a taxonomic tree.
+primary taxonomic assignment algorithms, and refines them using a taxonomic tree.
 The refinements are of two basic types:
+
   1. Tips of the tree which are unassigned are assigned to a taxon if the tree
      supports their inclusion in that taxon.
   2. Conflicting assignments between multiple primary algorithms are resolved
      using the tree.
+     
+The `phylotax` package also includes the wrapper function `taxonomy()` which
+assigns taxonomy to sequences using
+[DADA2](https://benjjneb.github.io/dada2/assign.html),
+[IDTAXA](http://www2.decipher.codes/Classification.html),
+or [SINTAX](https://www.drive5.com/usearch/manual/cmd_sintax.html), along the
+`taxtable()` function which converts the results to a uniform format.
+
+### Example data
 
 Here is an example of a tree:
 
@@ -46,16 +56,15 @@ library(phylotax)
 plot(example_tree(), show.node.label = TRUE)
 ```
 
-And here is a set of taxonomic assignments for the tips of the tree, based on
+Here is a set of taxonomic assignments for the tips of the tree, based on
 two hypothetical primary assignment algorithms "XTAX" and "YTAX".
-(`phylotax` also includes the wrapper function `taxonomy()` which can assign
-taxonomy to sequences using [DADA2](https://benjjneb.github.io/dada2/assign.html), [IDTAXA](http://www2.decipher.codes/Classification.html), or [SINTAX](https://www.drive5.com/usearch/manual/cmd_sintax.html), and the `taxtable()` function which converts the results to the required format).
-Some of the tips have been assigned to two genera: "Tax1" and "Tax2".
-The `phylotax` package includes the function `taxtable()` which can generate
-a table of this type based on the output of various primary assignment
-algorithms, but all that's important is that it contains the columns "label",
-"rank", and "taxon".  The ranks should be one of "rootrank", "domain",
-"kingdom", "phylum", "class", "order", "family", "genus", and "species", or can be specified by the argument `ranks=` to `phylotax()`.
+The required columns are "label", "rank", and "taxon", which identify individual OTUs,
+taxonomic ranks, and taxonomic assignments.
+The OTU labels are the same as the tip labels on the tree,
+in this case the letters A-F, although some are missing from the taxonomy table
+because the algorithms could not place them.
+Only assignments at the rank of genus are present in this small example,
+and the genera in question are called "Tax1" and "Tax2".
 Our example also has a "method" column, which PHYLOTAX uses to identify which
 assignments come from the same source.
 
@@ -70,6 +79,8 @@ Neither algorithm has placed tips A and E, and XTAX also failed to place tip F.
 ```{r}
 dplyr::arrange(example_taxa(), label)
 ```
+
+### Use PHYLOTAX
 
 Use PHYLOTAX to resolve conflicts and assign additional tips where the tree
 supports it.
@@ -114,6 +125,7 @@ PHYLOTAX has used the following logic:
 5. At node 5, there is nothing to do, because PHYLOTAX already assigned it to
   Tax1 in step 4.
 
+### Continued analysis
 
 If you are continuing on with analysis using the
 [phyloseq](https://joey711.github.io/phyloseq/index.html) package, then you can
@@ -136,9 +148,9 @@ Now we can easily create the phyloseq object.
 physeq <- phylotax_to_phyloseq(phylotax_out, otus)
 ```
 
-And use it for plots or whatever further analysis we need.
+And use it for plots or whatever further analysis is needed.
 
 ```{r, fig.asp = 0.25}
-plot_tree(physeq, color="genus")
+plot_tree(physeq, color = "genus")
 ```
 
