@@ -607,9 +607,10 @@ extract_taxon <- function(phylotax, taxon, true_members = NULL) {
   checkmate::assert_class(phylotax, "phylotax")
   checkmate::assert_string(taxon)
   tips <-
-      dplyr::group_by_at(phylotax$assigned, "label") %>%
-      dplyr::filter(!!taxon %in% .data$taxon) %$%
-      unique(label)
+    dplyr::group_by_at(phylotax$assigned, "label") %>%
+    dplyr::filter(!!taxon %in% .data$taxon) %>%
+    dplyr::pull("label") %>%
+    unique()
   if (!is.null(phylotax$tree)) {
     tips <- setdiff(tips, phylotax$tree$tip.label)
     nodes <- dplyr::filter(phylotax$node_assigned, !!taxon == .data$taxon)
