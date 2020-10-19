@@ -6,5 +6,6 @@ bioc_packages:
    - DECIPHER
    - Biostrings
    - ShortRead
+   - phyloseq
 after_success:
   - Rscript -e 'covr::codecov()'
