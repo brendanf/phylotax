@@ -1,5 +1,7 @@
 # phylotax (development version)
 
+* New function `phylotax_to_phyloseq()` aids in followup analysis using the
+  [phyloseq](https://joey711.github.io/phyloseq/index.html) package.
 * New function `extract_taxon()` can be used to extract a particular taxon of
   interest from the results of `phylotax()` or `lca_consensus()`.
 * `phylotax()` automatically calls `lca_consensus()` for any labels which are

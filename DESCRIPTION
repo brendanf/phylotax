@@ -43,8 +43,9 @@ Imports:
    tibble,
    tidyr
 Suggests:
-    ShortRead,
-    covr,
-    testthat (>= 2.1.0)
+   phyloseq,
+   ShortRead,
+   covr,
+   testthat (>= 2.1.0)
 RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
