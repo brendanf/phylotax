@@ -43,14 +43,21 @@ plot(example_tree(), show.node.label = TRUE)
 
 And here is a set of taxonomic assignments for the tips of the tree,
 based on two hypothetical primary assignment algorithms “XTAX” and
-“YTAX”. Some of the tips have been assigned to two genera: “Tax1” and
+“YTAX”. (`phylotax` also includes the wrapper function `taxonomy()`
+which can assign taxonomy to sequences using
+[DADA2](https://benjjneb.github.io/dada2/assign.html),
+[IDTAXA](http://www2.decipher.codes/Classification.html), or
+[SINTAX](https://www.drive5.com/usearch/manual/cmd_sintax.html), and the
+`taxtable()` function which converts the results to the required
+format). Some of the tips have been assigned to two genera: “Tax1” and
 “Tax2”. The `phylotax` package includes the function `taxtable()` which
 can generate a table of this type based on the output of various primary
 assignment algorithms, but all that’s important is that it contains the
-columns “label”, “rank”, and “taxon”. The ranks need to be one of
+columns “label”, “rank”, and “taxon”. The ranks should be one of
 “rootrank”, “domain”, “kingdom”, “phylum”, “class”, “order”, “family”,
-“genus”, and “species”. Our example also has a “method” column, which
-PHYLOTAX uses to identify which assignments come from the same source.
+“genus”, and “species”, or can be specified by the argument `ranks=` to
+`phylotax()`. Our example also has a “method” column, which PHYLOTAX
+uses to identify which assignments come from the same source.
 
 ``` r
 example_taxa()
@@ -89,8 +96,8 @@ tree supports it.
 
 ``` r
 phylotax_out <- phylotax(tree = example_tree(), taxa = example_taxa())
-#> INFO [2020-10-18 17:19:19] Assigned node 9 (label: 3) and its 2 descendant(s) to genus Tax2.
-#> INFO [2020-10-18 17:19:19] Assigned node 10 (label: 4) and its 3 descendant(s) to genus Tax1.
+#> INFO [2020-10-19 10:28:54] Assigned node 9 (label: 3) and its 2 descendant(s) to genus Tax2.
+#> INFO [2020-10-19 10:28:54] Assigned node 10 (label: 4) and its 3 descendant(s) to genus Tax1.
 ```
 
 PHYLOTAX returns a list of class “`phylotax`” containing the tree, taxa
@@ -131,7 +138,7 @@ phylotax_out$rejected
 #> 2 D     XTAX   genus Tax2
 ```
 
-Phylotax has used the following logic:
+PHYLOTAX has used the following logic:
 
 1.  It’s not possible to decide what the root (node 1) is, because one
     of its direct children (tip A) is completely unassigned.
@@ -149,3 +156,33 @@ Phylotax has used the following logic:
     node 4 and all its children.
 5.  At node 5, there is nothing to do, because PHYLOTAX already assigned
     it to Tax1 in step 4.
+
+If you are continuing on with analysis using the
+[phyloseq](https://joey711.github.io/phyloseq/index.html) package, then
+you can easily create a `phyloseq` object from a `phylotax` object and
+an OTU table.
+
+To demonstrate, we first create a random presence/absence OTU table for
+5 samples and the 6 OTUS present in our example dataset. Each species
+has a 50% chance to be present in each sample.
+
+``` r
+library(phyloseq)
+set.seed(1)
+otus <- matrix(rbinom(30, 1, 0.5),nrow = 5, dimnames = list(1:5, LETTERS[1:6]))
+otus <- otu_table(otus, taxa_are_rows = FALSE)
+```
+
+Now we can easily create the phyloseq object.
+
+``` r
+physeq <- phylotax_to_phyloseq(phylotax_out, otus)
+```
+
+And use it for plots or whatever further analysis we need.
+
+``` r
+plot_tree(physeq, color="genus")
+```
+
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
