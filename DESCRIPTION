@@ -49,3 +49,5 @@ Suggests:
    testthat (>= 2.1.0)
 RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
+Depends: 
+    R (>= 2.10)

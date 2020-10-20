@@ -24,7 +24,8 @@ rdp <- Biostrings::DNAStringSet(rdp)
 sebacinales <- rdp[grepl("Sebacinales", names(rdp))]
 sebacinales_accno <-
   vapply(strsplit(names(sebacinales), "\t", fixed = TRUE), dplyr::first, "")
-oldnames <- names(sebacinales)
+sebacinales_oldnames <- gsub("\\t.+;", "=", names(sebacinales))
+names(sebacinales_oldnames) <- sebacinales_accno
 names(sebacinales) <- sebacinales_accno
 
 # an ENTREZ key is probably necessary to avoid ketting kicked off the NCBI server.
@@ -99,3 +100,5 @@ Biostrings::writeXStringSet(
   here::here("inst", "extdata", "dacrymycetes.fasta.gz"),
   compress = TRUE
 )
+
+usethis::use_data(sebacinales_oldnames)
