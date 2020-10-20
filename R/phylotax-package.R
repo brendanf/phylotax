@@ -13,3 +13,8 @@ NULL
 
 # get rid of CRAN notes
 utils::globalVariables(c("."))
+
+
+#' Original genus-level names of the Sebacinales dataset
+#' @source https://rdp.cme.msu.edu/
+"sebacinales_oldnames"
