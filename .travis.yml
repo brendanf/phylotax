@@ -2,8 +2,11 @@
 
 language: R
 cache: packages
+apt_packages:
+   - vsearch
 bioc_packages:
    - DECIPHER
+   - dada2
    - Biostrings
    - ShortRead
    - phyloseq
