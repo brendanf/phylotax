@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  dpi = 150
 )
 ```
 
@@ -167,7 +168,15 @@ The data in question are LSU rDNA sequences belonging to the fungal order
 Sebacinales, taken from the [RDP](https://rdp.cme.msu.edu/) fungal training set.
 At the time of the publication of the RDP training set, much of the order
 Sebacinales was grouped into a large, polyphyletic genus, *Sebacina*.
-Since the work of [#1]
+Since the work of Oberwinkler et al.<sup id="a1">[1](#f1)</sup>, the order has
+been split in two families, Serendipitaceae and Sebacinaceae, and several
+additional genera.
+For sequences in the database which are annotated as a particular species,
+we can look up the current name and classification for that species.
+However, for sequences originally annotated as "*Sebacina* sp.",
+"uncultured *Sebacina*", etc., there is way to decide what family/genus it should
+belong in now, except by re-identifying the sequences.
+
 This is a very small example, with only 15 reference sequences and 39 "unknown"
 sequences, so it will run quickly. The references are the sequences from the
 dataset that were annnotated all the way to genus level, while the unknowns are
@@ -387,4 +396,4 @@ plot(old_tree, cex = 0.5)
 ```
 
 
-[#1] Oberwinkler, F., Riess, K., Bauer, R. et al. Morphology and molecules: the Sebacinales, a case study. Mycol Progress 13, 445–470 (2014). https://doi-org.ezproxy.its.uu.se/10.1007/s11557-014-0983-1
+<a name="f1">1</a> Oberwinkler, F., Riess, K., Bauer, R. et al. Morphology and molecules: the Sebacinales, a case study. Mycol Progress 13, 445–470 (2014). https://doi.org/10.1007/s11557-014-0983-1 [↩](#a1)
