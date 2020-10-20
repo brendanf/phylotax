@@ -558,9 +558,9 @@ lca_consensus <- function(
       node_assigned = NULL,
       tree = NULL,
       assigned = assigned,
-      retained = dplyr::semi_join(taxa, assigned, by = c("label", "rank")),
-      rejected = dplyr::anti_join(taxa, assigned, by = c("label", "rank")),
-      missing = dplyr::filter(taxa, FALSE)
+      retained = taxa, # LCA retains everything
+      rejected = dplyr::filter(taxa, FALSE), # LCA never rejects anything
+      missing = dplyr::filter(taxa, FALSE) # nothing is missing from LCA
     ),
     class = "phylotax"
   )

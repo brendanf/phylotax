@@ -16,7 +16,8 @@ test_that("combined PHYLOTAX and LCA consensus work", {
     fallback = TRUE
   )
   checkmate::expect_tibble(p$missing, nrows = 0)
-  checkmate::expect_tibble(p$retained, nrows = 9)
+  checkmate::expect_tibble(p$retained, nrows = 11)
+  checkmate::expect_tibble(p$rejected, nrows = 2)
   checkmate::expect_tibble(p$assigned, nrows = 8)
   expect_equal(nrow(p$missing) + nrow(p$retained) + nrow(p$rejected),
                nrow(extra_taxa) + nrow(example_taxa()))
