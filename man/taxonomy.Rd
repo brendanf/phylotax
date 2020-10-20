@@ -25,7 +25,7 @@ taxonomy_sintax(
   reference,
   min_confidence = NULL,
   multithread = FALSE,
-  exec = "vsearch",
+  exec = NULL,
   ...
 )
 

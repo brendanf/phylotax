@@ -12,9 +12,9 @@ taxtable(tax, ...)
 
 taxtable_sintax(tax, min_confidence = 0, ...)
 
-taxtable_idtaxa(tax, min_confidence = 0, names = NULL, ...)
+taxtable_idtaxa(tax, min_confidence = 0, seq_id = NULL, ...)
 
-taxtable_dada2(tax, names = rownames(tax$tax), min_confidence = 0, ...)
+taxtable_dada2(tax, min_confidence = 0, ...)
 }
 \arguments{
 \item{tax}{Results from \code{taxonomy()}}
@@ -25,7 +25,7 @@ taxtable_dada2(tax, names = rownames(tax$tax), min_confidence = 0, ...)
 results. May be higher than the value given in \code{taxonomy()},
 but will have no effect if it is lower.}
 
-\item{names}{(\code{character} vector) names for the sequences; these will be the
+\item{seq_id}{(\code{character} vector) names for the sequences; these will be the
 values that end up in the "\code{label}" column. If not given explicitly, they are
 taken from the taxonomy results if this is possible.}
 }
