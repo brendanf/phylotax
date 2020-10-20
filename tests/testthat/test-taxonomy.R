@@ -1,5 +1,6 @@
-check_package <- function(package) if (!requireNamespace(package)) skip()
-check_executable <- function(exec) if (nchar(Sys.which(exec)) == 0) skip()
+check_executable <- function(exec) if (nchar(Sys.which(exec)) == 0) skip(
+  paste("skipping because executable: ", exec, "not present")
+)
 
 unknown_file <- system.file("extdata/unknowns.fasta.gz", package = "phylotax")
 unknowns <- Biostrings::readDNAStringSet(unknown_file)
@@ -7,7 +8,7 @@ dada_ref <- system.file("extdata/sebacinales.dada2.fasta.gz", package = "phylota
 sintax_ref <- system.file("extdata/sebacinales.sintax.fasta.gz", package = "phylotax")
 
 test_that("dada2 taxonomy works", {
-  check_package("dada2")
+  skip_if_not_installed("dada2")
   set.seed(1)
   dada2_result <- taxonomy(unknowns, reference = dada_ref, method = "dada2")
   checkmate::expect_list(dada2_result, len = 2)
@@ -34,7 +35,7 @@ test_that("sintax taxonomy works", {
 
 
 test_that("idtaxa taxonomy works", {
-  check_package("DECIPHER")
+  skip_if_not_installed("DECIPHER")
   set.seed(1)
   idtaxa_model <- train_idtaxa(sintax_ref)
   checkmate::expect_class(idtaxa_model, c("Taxa", "Train"))
