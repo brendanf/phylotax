@@ -69,6 +69,10 @@ taxonomy_dada2 <- function(seq, reference, multithread = FALSE, min_confidence,
                            tryRC = FALSE,
                            outputBootstraps = TRUE,
                            verbose = TRUE, ...) {
+  assertthat::assert_that(
+    requireNamespace("dada2"),
+    msg = "'dada2' package is required to assign taxonomy using DADA2."
+  )
   dada2::assignTaxonomy(seqs = chartr("Uu", "Tt", seq),
                         refFasta = reference,
                         tryRC = tryRC,
@@ -85,7 +89,24 @@ taxonomy_dada2 <- function(seq, reference, multithread = FALSE, min_confidence,
 #' system path.
 #' @rdname taxonomy
 #' @export
-taxonomy_sintax <- function(seq, reference, min_confidence = NULL, multithread = FALSE, exec = "vsearch", ...) {
+taxonomy_sintax <- function(seq, reference, min_confidence = NULL, multithread = FALSE, exec = NULL, ...) {
+  if (is.null(exec)) {
+    exec <- Sys.which(c("usearch", "vsearch"))
+    exec <- exec[nchar(exec) > 0]
+  }
+  assertthat::assert_that(
+    length(exec) > 0,
+    msg = paste("External software USEARCH or VSEARCH are required to assign",
+                "taxonomy with SINTAX. If they are installed and you are still",
+                "getting this message, try supplying",
+                "the full path to the executable with argument 'exec='")
+  )
+  assertthat::assert_that(
+    suppressWarnings(system2(exec, "--version")) == 0,
+    msg = paste("External software USEARCH or VSEARCH are required to assign",
+    "taxonomy with SINTAX. Executable at", exec, "failed.  Try supplying a",
+    "different executable with argument 'exec='")
+  )
   args <- character()
   if (assertthat::is.string(seq) && file.exists(seq)) {
     seqfile <- seq
@@ -175,6 +196,10 @@ taxonomy_sintax <- function(seq, reference, min_confidence = NULL, multithread =
 #' @rdname taxonomy
 #' @export
 taxonomy_idtaxa <- function(seq, reference, multithread = FALSE, strand = "top", min_confidence = 40, ...) {
+  assertthat::assert_that(
+    requireNamespace("DECIPHER"),
+    msg = "'DECIPHER' package is required to assign taxonomy using IDTAXA."
+  )
   if (isTRUE(multithread)) multithread <- NULL
   if (isFALSE(multithread)) multithread <- 1
   if (!methods::is(seq, "XStringSet")) {
@@ -328,6 +353,10 @@ taxtable_dada2 <- function(tax, names = rownames(tax$tax),
 #' `taxonomy_idtaxa()` or `DECIPHER::IdTaxa()`
 #' @export
 train_idtaxa <- function(fasta) {
+  assertthat::assert_that(
+    requireNamespace("DECIPHER"),
+    msg = "'DECIPHER' package is required to train an IDTAXA model."
+  )
   seqdata <- Biostrings::readDNAStringSet(fasta)
   taxonomy <- names(seqdata)
 
