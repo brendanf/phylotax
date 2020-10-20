@@ -1,5 +1,8 @@
 # phylotax (development version)
 
+* Argument "`names`" is no longer required for `taxonomy(method = 'dada2')`,
+  these are not taken directly from the dada2 taxonomy result (which will have
+  names as long as the input sequences had names).
 * New function `phylotax_to_phyloseq()` aids in followup analysis using the
   [phyloseq](https://joey711.github.io/phyloseq/index.html) package.
 * New function `extract_taxon()` can be used to extract a particular taxon of

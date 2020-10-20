@@ -301,13 +301,13 @@ taxtable_sintax <- function(tax, min_confidence = 0, ...) {
     dplyr::filter(.data$confidence >= min_confidence, !is.na(.data$taxon))
 }
 
-#' @param names (`character` vector) names for the sequences; these will be the
+#' @param seq_id (`character` vector) names for the sequences; these will be the
 #' values that end up in the "`label`" column. If not given explicitly, they are
 #' taken from the taxonomy results if this is possible.
 #' @rdname taxtable
 #' @export
-taxtable_idtaxa <- function(tax, min_confidence = 0, names = NULL, ...) {
-  if (!missing(names) && !is.null(names)) names(tax) <- names
+taxtable_idtaxa <- function(tax, min_confidence = 0, seq_id = NULL, ...) {
+  if (!missing(seq_id) && !is.null(seq_id)) names(tax) <- seq_id
   purrr::imap_dfr(tax, ~tibble::tibble(label = .y,
                                        rank = rank_factor(.x$rank),
                                        taxon = gsub(" ", "_", .x$taxon),
@@ -320,13 +320,14 @@ taxtable_idtaxa <- function(tax, min_confidence = 0, names = NULL, ...) {
 
 #' @rdname taxtable
 #' @export
-taxtable_dada2 <- function(tax, names = rownames(tax$tax),
+taxtable_dada2 <- function(tax,
                            min_confidence = 0, ...) {
-  taxa <- tax$tax %>% magrittr::set_rownames(names) %>%
+  taxa <- tax$tax %>%
+    magrittr::set_rownames(names(rownames(.))) %>%
     tibble::as_tibble(rownames = "label") %>%
     tidyr::gather(key = "rank", value = "taxon", -1)
   conf <- (tax$boot / 100) %>%
-    magrittr::set_rownames(names) %>%
+    magrittr::set_rownames(names(rownames(.))) %>%
     tibble::as_tibble(rownames = "label") %>%
     tidyr::gather(key = "rank", value = "confidence", -1)
   dplyr::full_join(taxa, conf, by = c("label", "rank")) %>%
