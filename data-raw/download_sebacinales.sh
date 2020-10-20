@@ -12,7 +12,7 @@ gzip -c > ../inst/extdata/sebacinales.sintax.fasta.gz
 wget -O - "https://github.com/brendanf/reannotate/releases/download/v0.1/rdp_train.LSU.sintax.fasta.gz" |
 zcat |
 sed '/^>/!{{H; $!d}}; /^>/ x; $x; /^>.*o:Sebacinales/ !d; /unidentified/ !d; 1 d' |
-awk '/^>/{gsub(/^>.*/,">Seq"i++" ");}1' i=1 |
+awk '/^>/{gsub(/^>.*/,">Seq"i++);}1' i=1 |
 gzip -c > ../inst/extdata/unknowns.fasta.gz
 
 wget -O - "https://github.com/brendanf/reannotate/releases/download/v0.1/rdp_train.LSU.dada2.fasta.gz" |
