@@ -457,14 +457,12 @@ make_taxon_labels <- function(t, cols = character(), abbrev = FALSE) {
   checkmate::assert_subset(c("label", "rank", "taxon"), colnames(t))
   checkmate::assert_character(cols)
   checkmate::assert_subset(cols, colnames(t))
-  dplyr::group_by_at(t, c("label", "rank")) %>%
-    dplyr::summarize_at(
-      c("taxon", cols),
-      c(
-        list(~ condense_taxa(., abbrev = abbrev)),
-        rep(list(collapse_non_na), length(cols))
-      )
-    )%>%
+  t <- dplyr::group_by_at(t, c("label", "rank"))
+  dplyr::left_join(
+    dplyr::summarize_at(t, "taxon", condense_taxa, abbrev = abbrev),
+    dplyr::summarize_at(t, cols, collapse_non_na),
+    by = c("label", "rank")
+  ) %>%
     dplyr::group_by_at("label") %>%
     dplyr::arrange(rank) %>%
     dplyr::summarize(
@@ -472,7 +470,7 @@ make_taxon_labels <- function(t, cols = character(), abbrev = FALSE) {
         paste,
         c(
           list(.data$label[1]),
-          purrr::map(cols, ~ .data[[.]]),
+          purrr::map(cols, ~ .y[[.x]][1], .data),
           list(paste0(.data$taxon, collapse = "-"))
         )
       )
