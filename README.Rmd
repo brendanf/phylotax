@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 # phylotax
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.com/brendanf/phylotax.svg?branch=master)](https://travis-ci.com/brendanf/phylotax)
+[![R build status](https://github.com/brendanf/phylotax/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/brendanf/phylotax/actions)
 [![Codecov test coverage](https://codecov.io/gh/brendanf/phylotax/branch/master/graph/badge.svg)](https://codecov.io/gh/brendanf/phylotax?branch=master)
 <!-- badges: end -->
 

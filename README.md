@@ -6,8 +6,8 @@ phylotax
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.com/brendanf/phylotax.svg?branch=master)](https://travis-ci.com/brendanf/phylotax)
+[![R build
+status](https://github.com/brendanf/phylotax/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/brendanf/phylotax/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/brendanf/phylotax/branch/master/graph/badge.svg)](https://codecov.io/gh/brendanf/phylotax?branch=master)
 <!-- badges: end -->
@@ -103,8 +103,8 @@ tree supports it.
 
 ``` r
 phylotax_out <- phylotax(tree = example_tree(), taxa = example_taxa())
-#> INFO [2020-10-20 16:04:59] Assigned node 9 (label: 3) and its 2 descendant(s) to genus Tax2.
-#> INFO [2020-10-20 16:04:59] Assigned node 10 (label: 4) and its 3 descendant(s) to genus Tax1.
+#> INFO [2021-03-03 07:03:38] Assigned node 9 (label: 3) and its 2 descendant(s) to genus Tax2.
+#> INFO [2021-03-03 07:03:38] Assigned node 10 (label: 4) and its 3 descendant(s) to genus Tax1.
 ```
 
 PHYLOTAX returns a list of class “`phylotax`” containing the tree, taxa
@@ -258,7 +258,7 @@ aln <- AlignSeqs(c(unknowns, outgroup))
 #> Aligning Sequences:
 #> ================================================================================
 #> 
-#> Time difference of 0.59 secs
+#> Time difference of 0.58 secs
 #> 
 #> Iteration 1 of 2:
 #> 
@@ -275,7 +275,7 @@ aln <- AlignSeqs(c(unknowns, outgroup))
 #> Realigning Sequences:
 #> ================================================================================
 #> 
-#> Time difference of 0.42 secs
+#> Time difference of 0.41 secs
 #> 
 #> Iteration 2 of 2:
 #> 
@@ -297,7 +297,7 @@ aln <- AlignSeqs(c(unknowns, outgroup))
 #> Refining the alignment:
 #> ================================================================================
 #> 
-#> Time difference of 0.1 secs
+#> Time difference of 0.09 secs
 ```
 
 Trim the ends where there are a lot of gaps.
@@ -348,7 +348,7 @@ dendro <- IdClusters(distmat, method = "ML", type = "dendrogram", myXStringSet =
 #> Transversion rates = 1
 #> Alpha = 0.535
 #> 
-#> Time difference of 6.55 secs
+#> Time difference of 6.87 secs
 ```
 
 PHYLOTAX needs the tree to be a `phylo` object from the `ape` package.
@@ -431,7 +431,7 @@ format as SINTAX.
 idtaxa_model <- train_idtaxa(sintax_ref)
 #> ================================================================================
 #> 
-#> Time difference of 0.59 secs
+#> Time difference of 0.6 secs
 ```
 
 Now that the model is trained, we can identify the unknown sequences.
@@ -440,7 +440,7 @@ Now that the model is trained, we can identify the unknown sequences.
 idtaxa_result <- taxonomy(unknowns, reference = idtaxa_model, method = "idtaxa")
 #> ================================================================================
 #> 
-#> Time difference of 0.11 secs
+#> Time difference of 0.12 secs
 ```
 
 IDTAXA gives its result as a list of lists. Here are the first three
@@ -482,7 +482,7 @@ str(sintax_result)
 #> tibble [39 × 5] (S3: tbl_df/tbl/data.frame)
 #>  $ label : chr [1:39] "AF291363" "AJ534930" "AJ534931" "AJ534932" ...
 #>  $ seq   : chr [1:39] "GCGGAGGAAAAGAAACTAACAAGGATTCCCCTAGTAACGGCGAGTGAAGAGGGAATAGCTCAAATTTTGAATCTGGCACCTTTGGTGTCCGAATTGTAATCTAGAGAAGTG"| __truncated__ "AACGGCGAGTGAAGAGGGAAGAGCTCAAATTTTGAATCTGGCGTCTTTGGCGTCCGAATTGTAATCTAGAGAAGTGTTTTCCGTGACGGACCGTGCATAAGTCTCCTGGAA"| __truncated__ "CCCGCTGAACTTAAGCATATCAATAAGCGGAGGAAAAGAAACTAACAAGGATTCCCCTAGTAACGGCGAGTGAAGAGGGAAGAGCTCAAATTTTGAATCTGGCGTCTCTGG"| __truncated__ "GTAACGGCGAGTGAAGAGGGAAGAGCTCAAATTTTGAATCTGGCACCTCTGGTGTCTGAGTTGTAATCTAGAGAAGTGCTTTCTGTGGCGGACCGTGCACAAGTCTCCTGG"| __truncated__ ...
-#>  $ hit   : chr [1:39] "k:Fungi(1.00),p:Basidiomycota(1.00),c:Agaricomycetes(1.00),o:Sebacinales(1.00),f:Sebacinaceae(1.00),g:Sebacina(0.98)" "k:Fungi(1.00),p:Basidiomycota(1.00),c:Agaricomycetes(1.00),o:Sebacinales(1.00),f:Sebacinaceae(1.00),g:Sebacina(0.98)" "k:Fungi(1.00),p:Basidiomycota(1.00),c:Agaricomycetes(1.00),o:Sebacinales(1.00),f:Sebacinaceae(1.00),g:Sebacina(0.88)" "k:Fungi(1.00),p:Basidiomycota(1.00),c:Agaricomycetes(1.00),o:Sebacinales(1.00),f:Sebacinaceae(0.97),g:Sebacina(0.95)" ...
+#>  $ hit   : chr [1:39] "k:Fungi(1.00),p:Basidiomycota(1.00),c:Agaricomycetes(1.00),o:Sebacinales(1.00),f:Sebacinaceae(1.00),g:Sebacina(0.98)" "k:Fungi(1.00),p:Basidiomycota(1.00),c:Agaricomycetes(1.00),o:Sebacinales(1.00),f:Sebacinaceae(1.00),g:Sebacina(0.98)" "k:Fungi(1.00),p:Basidiomycota(1.00),c:Agaricomycetes(1.00),o:Sebacinales(1.00),f:Sebacinaceae(0.99),g:Sebacina(0.86)" "k:Fungi(1.00),p:Basidiomycota(1.00),c:Agaricomycetes(1.00),o:Sebacinales(1.00),f:Sebacinaceae(0.97),g:Sebacina(0.91)" ...
 #>  $ strand: chr [1:39] "+" "+" "+" "+" ...
 #>  $ c12n  : chr [1:39] "k:Fungi,p:Basidiomycota,c:Agaricomycetes,o:Sebacinales,f:Sebacinaceae,g:Sebacina" "k:Fungi,p:Basidiomycota,c:Agaricomycetes,o:Sebacinales,f:Sebacinaceae,g:Sebacina" "k:Fungi,p:Basidiomycota,c:Agaricomycetes,o:Sebacinales,f:Sebacinaceae,g:Sebacina" "k:Fungi,p:Basidiomycota,c:Agaricomycetes,o:Sebacinales,f:Sebacinaceae,g:Sebacina" ...
 ```
@@ -539,7 +539,7 @@ nrow(dada2_taxonomy)
 nrow(idtaxa_taxonomy)
 #> [1] 42
 nrow(sintax_taxonomy)
-#> [1] 234
+#> [1] 230
 ```
 
 Keep in mind that assigning one sequence from kingdom to genus is a
@@ -592,14 +592,16 @@ time for PHYLOTAX.
 
 ``` r
 p <- phylotax(tree = tree, taxa = combined_taxonomy)
-#> INFO [2020-10-20 16:05:15] Assigned node 58 and its 39 descendant(s) to kingdom Fungi.
-#> INFO [2020-10-20 16:05:15] Assigned node 58 and its 39 descendant(s) to phylum Basidiomycota.
-#> INFO [2020-10-20 16:05:15] Assigned node 58 and its 39 descendant(s) to class Agaricomycetes.
-#> INFO [2020-10-20 16:05:15] Assigned node 58 and its 39 descendant(s) to order Sebacinales.
-#> INFO [2020-10-20 16:05:15] Assigned node 62 and its 21 descendant(s) to family Serendipitaceae.
-#> INFO [2020-10-20 16:05:15] Assigned node 62 and its 21 descendant(s) to genus Serendipita.
-#> INFO [2020-10-20 16:05:15] Assigned node 63 and its 18 descendant(s) to family Sebacinaceae.
-#> INFO [2020-10-20 16:05:15] Assigned node 63 and its 18 descendant(s) to genus Sebacina.
+#> INFO [2021-03-03 07:03:54] Assigned node 58 and its 39 descendant(s) to kingdom Fungi.
+#> INFO [2021-03-03 07:03:54] Assigned node 58 and its 39 descendant(s) to phylum Basidiomycota.
+#> INFO [2021-03-03 07:03:54] Assigned node 58 and its 39 descendant(s) to class Agaricomycetes.
+#> INFO [2021-03-03 07:03:54] Assigned node 58 and its 39 descendant(s) to order Sebacinales.
+#> INFO [2021-03-03 07:03:55] Assigned node 62 and its 21 descendant(s) to family Serendipitaceae.
+#> INFO [2021-03-03 07:03:55] Assigned node 62 and its 21 descendant(s) to genus Serendipita.
+#> INFO [2021-03-03 07:03:55] Assigned node 63 and its 18 descendant(s) to family Sebacinaceae.
+#> INFO [2021-03-03 07:03:55] Assigned node 21 and its 1 descendant(s) to genus Tremellodendron.
+#> INFO [2021-03-03 07:03:55] Assigned node 81 and its 3 descendant(s) to genus Sebacina.
+#> INFO [2021-03-03 07:03:55] Assigned node 78 and its 14 descendant(s) to genus Sebacina.
 ```
 
 We can look at the tree again to see how PHYLOTAX has cleaned up the
