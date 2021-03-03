@@ -1,4 +1,4 @@
-# phylotax (development version)
+# phylotax 0.0.4
 
 * Argument "`names`" is no longer required for `taxonomy(method = 'dada2')`,
   these are not taken directly from the dada2 taxonomy result (which will have
